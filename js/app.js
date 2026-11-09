@@ -406,7 +406,7 @@ function viewData() {
   const fmt = t => t ? new Date(t).toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' }) : 'jamais';
   render(`
     <h1>Données</h1>
-    <p class="muted small">Tout est enregistré uniquement dans cet appareil : rien n'est envoyé sur internet. Pour l'autre appareil, partage une sauvegarde (Quick Share) puis importe-la de l'autre côté ; les deux versions sont fusionnées.</p>
+    <p class="muted small">Tout est enregistré, chiffré, uniquement dans cet appareil : rien n'est envoyé sur internet. Pour l'autre appareil, partage une sauvegarde (Quick Share) puis importe-la de l'autre côté ; les deux versions sont fusionnées.</p>
     ${S.isMemoryOnly() ? `<div class="card" style="border-color:var(--ko);margin-bottom:12px"><b>Stockage indisponible.</b> Ce navigateur bloque l'enregistrement local : tes données seront perdues à la fermeture. Ouvre l'app depuis son adresse habituelle, hors navigation privée.</div>` : ''}
     <div class="grid">
       <div class="card"><h3>Envoyer vers l'autre appareil</h3>
@@ -428,22 +428,33 @@ function viewData() {
       <div class="stat"><div class="k">Jours modifiés</div><div class="v">${Object.values(st.overrides).filter(x => x.v).length}</div></div>
       <div class="stat"><div class="k">Textes ajoutés</div><div class="v">${S.alive('typingTexts').length + S.alive('readingTexts').length}</div></div>
     </div>
+    <h2>Accès et sécurité</h2>
+    <div class="card"><p class="small" style="margin-top:0">Tes données sont chiffrées sur cet appareil avec ton identifiant et ton mot de passe, ainsi que les fichiers partagés. L'app se verrouille après 15 minutes d'inactivité ou 5 minutes en arrière-plan. Sans le mot de passe, personne (pas même toi) ne peut récupérer les données.</p>
+      <details><summary class="small">Changer d'identifiant ou de mot de passe</summary>
+      <form id="cred-form" style="display:grid;gap:8px;margin-top:10px">
+        <input type="password" name="op" placeholder="Mot de passe actuel" autocomplete="current-password" aria-label="Mot de passe actuel">
+        <input type="text" name="nu" value="${esc(S.currentUser())}" placeholder="Identifiant" autocomplete="username" autocapitalize="off" aria-label="Identifiant">
+        <input type="password" name="np" placeholder="Nouveau mot de passe (8 caractères minimum)" autocomplete="new-password" aria-label="Nouveau mot de passe">
+        <input type="password" name="np2" placeholder="Confirme le nouveau mot de passe" autocomplete="new-password" aria-label="Confirmation du nouveau mot de passe">
+        <div><button class="btn" type="submit">Enregistrer</button></div><div class="small" id="cred-msg"></div></form></details>
+      <div class="row" style="margin-top:10px"><button class="btn" id="lock-now">🔒 Verrouiller maintenant</button></div></div>
     <h2>Installer l'app</h2>
     <p class="small">Sur Android (Chrome) : menu ⋮ puis <b>Installer l'application</b>. Sur Windows (Chrome ou Edge) : icône d'installation à droite de la barre d'adresse. Une fois installée, l'app fonctionne hors ligne.</p>
     <h2>Zone sensible</h2>
     <div class="card"><p class="small" style="margin-top:0">Effacer toutes les données de cet appareil. Pense à exporter avant.</p>
       <button class="btn" id="reset">Tout effacer…</button><div id="reset-confirm"></div></div>
-    <p class="tiny muted" style="margin-top:24px">MESAICOSA v1.2 · Mens sana in corpore sano</p>
+    <p class="tiny muted" style="margin-top:24px">MESAICOSA v1.3 · Mens sana in corpore sano</p>
   `);
   const fileName = () => `mesaicosa-${today()}.json`;
-  const download = () => {
-    const blob = new Blob([S.exportJSON()], { type: 'application/json' });
+  const download = async () => {
+    const blob = new Blob([await S.exportJSON()], { type: 'application/json' });
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fileName(); a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 2000); toast('Fichier téléchargé');
   };
   document.getElementById('dl').onclick = download;
+  document.getElementById('lock-now').onclick = lockApp;
   document.getElementById('share').onclick = async () => {
-    const file = new File([S.exportJSON()], fileName(), { type: 'application/json' });
+    const file = new File([await S.exportJSON()], fileName(), { type: 'application/json' });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       try { await navigator.share({ files: [file], title: 'Sauvegarde MESAICOSA' }); toast('Sauvegarde partagée'); }
       catch (e) { if (e.name !== 'AbortError') download(); }
@@ -453,20 +464,47 @@ function viewData() {
     const f = e.target.files[0]; if (!f) return;
     const msg = document.getElementById('imp-msg');
     e.target.value = '';
-    let r;
-    try { r = S.readFile(await f.text()); }
-    catch (err) { msg.innerHTML = `<span class="small feedback-ko">${esc(err.message)}</span>`; return; }
-    if (r.kind === 'sauvegarde') {
-      const n = r.apply();
-      msg.innerHTML = `<span class="small feedback-ok">Sauvegarde fusionnée : ${n} nouvelle${n > 1 ? 's' : ''} séance${n > 1 ? 's' : ''}, le reste est à jour.</span>`;
-      return;
-    }
-    msg.innerHTML = `<div class="card" style="border-color:var(--accent)"><h3>${esc(r.title)}</h3>
-      ${r.note ? `<p class="small muted" style="margin-top:0">${esc(r.note)}</p>` : ''}
-      <ul class="small">${r.lines.map(l => `<li>${esc(l)}</li>`).join('')}</ul>
-      <div class="row"><button class="btn primary" id="pk-yes">Appliquer ce paquet</button><button class="btn ghost" id="pk-no">Annuler</button></div></div>`;
-    document.getElementById('pk-yes').onclick = () => { r.apply(); toast('Paquet appliqué'); location.hash = '#jour'; };
-    document.getElementById('pk-no').onclick = () => { msg.innerHTML = ''; };
+    const text = await f.text();
+    const handle = async other => {
+      msg.innerHTML = '<span class="small muted">Lecture du fichier…</span>';
+      let r;
+      try { r = await S.readFile(text, other); }
+      catch (err) {
+        if (err.code === 'NEED_PASSWORD' || err.code === 'BAD') {
+          msg.innerHTML = `<form class="card" id="pw-form" style="display:grid;gap:8px;border-color:var(--accent)">
+            <p class="small" style="margin:0">Ce fichier a été chiffré avec un autre identifiant ou mot de passe (celui de ton autre appareil). Saisis-les pour l'ouvrir.</p>
+            ${err.code === 'BAD' ? '<p class="small feedback-ko" style="margin:0">Identifiant ou mot de passe incorrect pour ce fichier.</p>' : ''}
+            <input type="text" name="u" placeholder="Identifiant" autocomplete="username" autocapitalize="off" aria-label="Identifiant de l'autre appareil">
+            <input type="password" name="p" placeholder="Mot de passe" autocomplete="current-password" aria-label="Mot de passe de l'autre appareil">
+            <div class="row"><button class="btn primary" type="submit">Ouvrir le fichier</button><button class="btn ghost" type="button" id="pw-no">Annuler</button></div></form>`;
+          document.getElementById('pw-no').onclick = () => { msg.innerHTML = ''; };
+          document.getElementById('pw-form').onsubmit = ev => { ev.preventDefault(); const fm = ev.target; if (!fm.u.value.trim() || !fm.p.value) return; handle({ user: fm.u.value, pass: fm.p.value }); };
+          return;
+        }
+        msg.innerHTML = `<span class="small feedback-ko">${esc(err.message)}</span>`; return;
+      }
+      if (r.kind === 'sauvegarde') {
+        const n = r.apply();
+        msg.innerHTML = `<span class="small feedback-ok">Sauvegarde fusionnée : ${n} nouvelle${n > 1 ? 's' : ''} séance${n > 1 ? 's' : ''}, le reste est à jour.</span>`;
+        return;
+      }
+      msg.innerHTML = `<div class="card" style="border-color:var(--accent)"><h3>${esc(r.title)}</h3>
+        ${r.note ? `<p class="small muted" style="margin-top:0">${esc(r.note)}</p>` : ''}
+        <ul class="small">${r.lines.map(l => `<li>${esc(l)}</li>`).join('')}</ul>
+        <div class="row"><button class="btn primary" id="pk-yes">Appliquer ce paquet</button><button class="btn ghost" id="pk-no">Annuler</button></div></div>`;
+      document.getElementById('pk-yes').onclick = () => { r.apply(); toast('Paquet appliqué'); location.hash = '#jour'; };
+      document.getElementById('pk-no').onclick = () => { msg.innerHTML = ''; };
+    };
+    handle();
+  };
+  document.getElementById('cred-form').onsubmit = async e => {
+    e.preventDefault(); const fm = e.target, out = document.getElementById('cred-msg');
+    if (fm.np.value.length < 8) { out.innerHTML = '<span class="feedback-ko">Le nouveau mot de passe doit faire au moins 8 caractères.</span>'; return; }
+    if (fm.np.value !== fm.np2.value) { out.innerHTML = '<span class="feedback-ko">Les deux nouveaux mots de passe ne correspondent pas.</span>'; return; }
+    if (!fm.nu.value.trim()) { out.innerHTML = '<span class="feedback-ko">Indique un identifiant.</span>'; return; }
+    out.innerHTML = '<span class="muted">Chiffrement…</span>';
+    try { await S.changeCredentials(fm.op.value, fm.nu.value.trim(), fm.np.value); out.innerHTML = '<span class="feedback-ok">Accès modifié. Pense à faire de même sur ton autre appareil.</span>'; fm.reset(); fm.nu.value = S.currentUser(); }
+    catch (err) { out.innerHTML = `<span class="feedback-ko">${esc(err.message)}</span>`; }
   };
   document.getElementById('reset').onclick = () => {
     document.getElementById('reset-confirm').innerHTML = `<p class="small feedback-ko">Toutes les données de cet appareil seront effacées définitivement.</p>
@@ -490,13 +528,97 @@ function route() {
   else if (name === 'donnees') viewData();
   else viewDay(today());
 }
-window.addEventListener('hashchange', route);
-route();
+window.addEventListener('hashchange', () => { if (S.isUnlocked()) route(); });
 
-(() => {
+// ---------------------------------------------------------------- Verrou
+async function lockApp() { await S.flush(); location.reload(); }
+
+function startIdleLock() {
+  const IDLE = 15 * 60 * 1000, HIDDEN = 5 * 60 * 1000;
+  let last = Date.now(), hiddenAt = 0;
+  const bump = () => { last = Date.now(); };
+  ['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(ev => window.addEventListener(ev, bump, { passive: true }));
+  setInterval(() => { if (Date.now() - last > IDLE) lockApp(); }, 30000);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { hiddenAt = Date.now(); S.flush(); }
+    else if (hiddenAt && Date.now() - hiddenAt > HIDDEN) lockApp();
+  });
+  document.getElementById('topbar-extra').innerHTML = '<button class="btn small ghost" id="lock-top" aria-label="Verrouiller l\'app">🔒</button>';
+  document.getElementById('lock-top').onclick = lockApp;
+}
+
+function gate() {
+  document.body.classList.add('locked');
+  if (!isCryptoOK()) {
+    view.innerHTML = '<div class="card lockcard"><h1>Navigateur non compatible</h1><p class="small">Ouvre l\'app dans une version récente de Chrome ou Edge, depuis son adresse https.</p></div>';
+    return;
+  }
+  const status = S.lockStatus();
+  let fails = 0, blockedUntil = 0;
+  const draw = () => {
+    view.innerHTML = status === 'setup' ? `
+    <form class="card lockcard" id="gate" autocomplete="on">
+      <div class="brand" style="justify-content:center;margin-bottom:8px"><span class="brand-mark">M</span><span>MESAICOSA</span></div>
+      <h1>Créer ton accès</h1>
+      <p class="small muted">Tes données seront chiffrées sur cet appareil avec ces identifiants. Utilise les mêmes sur ton téléphone et ton PC : le partage entre appareils se fera sans ressaisie.</p>
+      <input type="text" name="u" placeholder="Identifiant" autocomplete="username" autocapitalize="off" aria-label="Identifiant">
+      <input type="password" name="p" placeholder="Mot de passe (8 caractères minimum)" autocomplete="new-password" aria-label="Mot de passe">
+      <input type="password" name="p2" placeholder="Confirme le mot de passe" autocomplete="new-password" aria-label="Confirmation du mot de passe">
+      <label class="small row" style="flex-wrap:nowrap;align-items:flex-start"><input type="checkbox" name="ok" style="margin-top:3px"> J'ai compris : sans ce mot de passe, mes données ne pourront pas être récupérées. Je le note dans un endroit sûr.</label>
+      <div class="small feedback-ko" id="g-err"></div>
+      <button class="btn primary" type="submit">Créer mon accès</button>
+    </form>` : `
+    <form class="card lockcard" id="gate" autocomplete="on">
+      <div class="brand" style="justify-content:center;margin-bottom:8px"><span class="brand-mark">M</span><span>MESAICOSA</span></div>
+      <h1>Déverrouiller</h1>
+      <input type="text" name="u" placeholder="Identifiant" autocomplete="username" autocapitalize="off" aria-label="Identifiant">
+      <input type="password" name="p" placeholder="Mot de passe" autocomplete="current-password" aria-label="Mot de passe">
+      <div class="small feedback-ko" id="g-err"></div>
+      <button class="btn primary" type="submit">Ouvrir</button>
+      <details class="small" style="margin-top:6px"><summary>Mot de passe oublié ?</summary>
+        <p class="muted">Tes données sont chiffrées : elles ne peuvent pas être récupérées sans le mot de passe. Tu peux effacer cet appareil et repartir de zéro, puis réimporter une sauvegarde de ton autre appareil ou un paquet.</p>
+        <button class="btn small" type="button" id="wipe">Effacer les données de cet appareil…</button><div id="wipe-c"></div></details>
+    </form>`;
+    const fm = document.getElementById('gate'), err = document.getElementById('g-err');
+    fm.addEventListener('input', () => { err.textContent = ''; });
+    setTimeout(() => fm.u.focus(), 50);
+    fm.onsubmit = async e => {
+      e.preventDefault();
+      const u = fm.u.value.trim(), p = fm.p.value;
+      if (Date.now() < blockedUntil) { err.textContent = `Trop d'essais. Réessaie dans ${Math.ceil((blockedUntil - Date.now()) / 1000)} s.`; return; }
+      if (!u) { err.textContent = 'Indique ton identifiant.'; fm.u.focus(); return; }
+      if (status === 'setup') {
+        if (p.length < 8) { err.textContent = 'Le mot de passe doit faire au moins 8 caractères.'; fm.p.focus(); return; }
+        if (p !== fm.p2.value) { err.textContent = 'Les deux mots de passe ne correspondent pas.'; fm.p2.focus(); return; }
+        if (!fm.ok.checked) { err.textContent = 'Coche la case pour confirmer.'; return; }
+      } else if (!p) { err.textContent = 'Indique ton mot de passe.'; fm.p.focus(); return; }
+      const btn = fm.querySelector('button[type=submit]'); btn.disabled = true; btn.textContent = status === 'setup' ? 'Chiffrement…' : 'Ouverture…';
+      try {
+        if (status === 'setup') await S.setup(u, p); else await S.unlock(u, p);
+        document.body.classList.remove('locked');
+        startIdleLock(); route(); exportReminder();
+      } catch (ex) {
+        fails++; if (fails >= 5) { blockedUntil = Date.now() + 30000; fails = 0; }
+        btn.disabled = false; btn.textContent = status === 'setup' ? 'Créer mon accès' : 'Ouvrir';
+        err.textContent = ex.message || 'Erreur inattendue.'; fm.p.value = ''; fm.p.focus();
+      }
+    };
+    document.getElementById('wipe')?.addEventListener('click', () => {
+      document.getElementById('wipe-c').innerHTML = `<p class="feedback-ko">Toutes les données de cet appareil seront effacées définitivement.</p>
+        <button class="btn small" type="button" id="wipe-yes" style="border-color:var(--ko);color:var(--ko)">Oui, tout effacer</button>`;
+      document.getElementById('wipe-yes').onclick = () => { S.wipeDevice(); location.reload(); };
+    });
+  };
+  draw();
+}
+const isCryptoOK = () => !!(globalThis.crypto && crypto.subtle) && window.isSecureContext;
+
+function exportReminder() {
   const st = S.get();
   if (st.sessions.length && Date.now() - (st.lastExport || 0) > 7 * 864e5) setTimeout(() => toast('Pense à partager tes données vers ton autre appareil (onglet Données)'), 1500);
-})();
+}
+
+gate();
 
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   navigator.serviceWorker.register('sw.js').catch(() => {});

@@ -24,22 +24,69 @@ function blank() {
   };
 }
 
-let state;
+import * as C from './crypto.js';
+
+const VAULT = 'mesaicosa.vault';   // données chiffrées
+let state = null;
+let key = null;                     // clé AES en mémoire tant que l'app est déverrouillée
+let cred = null;                    // identifiant et mot de passe en mémoire (jamais enregistrés)
+let vaultMeta = null;               // {salt, iter}
 let memoryOnly = false;
-try {
-  const raw = localStorage.getItem(KEY);
-  state = raw ? { ...blank(), ...JSON.parse(raw) } : blank();
-} catch (e) {
-  memoryOnly = true;
-  state = blank();
+let pending = Promise.resolve();
+
+function readLS(k) { try { return localStorage.getItem(k); } catch { memoryOnly = true; return null; } }
+function writeLS(k, v) { try { localStorage.setItem(k, v); } catch { memoryOnly = true; } }
+function removeLS(k) { try { localStorage.removeItem(k); } catch { /* rien */ } }
+
+// 'setup' : aucun accès créé ; 'locked' : accès existant, à déverrouiller
+export function lockStatus() { return readLS(VAULT) ? 'locked' : 'setup'; }
+export function isUnlocked() { return !!key; }
+export function currentUser() { return cred?.user || ''; }
+
+async function persist() {
+  const box = await C.encryptText(key, JSON.stringify(state));
+  writeLS(VAULT, JSON.stringify({ v: 1, salt: vaultMeta.salt, iter: vaultMeta.iter, ...box }));
 }
+
+export async function setup(user, pass) {
+  vaultMeta = { salt: C.newSalt(), iter: C.ITERATIONS };
+  key = await C.deriveKey(user, pass, vaultMeta.salt, vaultMeta.iter);
+  cred = { user, pass };
+  // reprise des données d'une version précédente non chiffrée
+  const raw = readLS(KEY);
+  try { state = raw ? { ...blank(), ...JSON.parse(raw) } : blank(); } catch { state = blank(); }
+  await persist();
+  removeLS(KEY);
+}
+
+export async function unlock(user, pass) {
+  const v = JSON.parse(readLS(VAULT));
+  const k = await C.deriveKey(user, pass, v.salt, v.iter);
+  let text;
+  try { text = await C.decryptText(k, v); } catch { throw new Error('Identifiant ou mot de passe incorrect.'); }
+  key = k; cred = { user, pass }; vaultMeta = { salt: v.salt, iter: v.iter };
+  state = { ...blank(), ...JSON.parse(text) };
+}
+
+export async function changeCredentials(oldPass, newUser, newPass) {
+  if (oldPass !== cred.pass) throw new Error('Mot de passe actuel incorrect.');
+  vaultMeta = { salt: C.newSalt(), iter: C.ITERATIONS };
+  key = await C.deriveKey(newUser, newPass, vaultMeta.salt, vaultMeta.iter);
+  cred = { user: newUser, pass: newPass };
+  await pending; await persist();
+}
+
+export async function flush() { await pending; }
+
+export function wipeDevice() { removeLS(VAULT); removeLS(KEY); }
 
 export function get() { return state; }
 export function isMemoryOnly() { return memoryOnly; }
 
+// Chaque enregistrement est chiffré puis écrit, dans l'ordre.
 export function save() {
-  try { localStorage.setItem(KEY, JSON.stringify(state)); }
-  catch (e) { memoryOnly = true; }
+  if (!key) return;
+  pending = pending.then(persist).catch(() => { memoryOnly = true; });
 }
 
 // --- valeurs horodatées (le plus récent gagne lors d'une fusion)
@@ -128,9 +175,19 @@ function applyPack(d) {
 }
 
 // Lit un fichier ; renvoie de quoi afficher un aperçu puis appliquer.
-export function readFile(text) {
+// Sauvegarde chiffrée : essaie l'accès actuel, sinon demande celui de l'autre appareil (other).
+export async function readFile(text, other) {
   let p;
   try { p = JSON.parse(text); } catch { throw new Error("Ce fichier n'est pas lisible par MESAICOSA."); }
+  if (p && p.app === 'mesaicosa' && p.kind === 'sauvegarde-chiffree') {
+    const tries = other ? [other] : [cred];
+    let out = null;
+    for (const c of tries) {
+      try { const k = await C.deriveKey(c.user, c.pass, p.salt, p.iter); out = await C.decryptText(k, p); break; } catch { /* suivant */ }
+    }
+    if (!out) { const e = new Error(other ? 'Identifiant ou mot de passe incorrect pour ce fichier.' : 'NEED_PASSWORD'); e.code = other ? 'BAD' : 'NEED_PASSWORD'; throw e; }
+    p = JSON.parse(out);
+  }
   if (!p || p.app !== 'mesaicosa' || !p.data) throw new Error("Ce fichier ne vient pas de MESAICOSA.");
   if (p.kind === 'paquet') {
     return { kind: 'paquet', title: p.title || 'Paquet', note: p.note || '', lines: packSummary(p.data), apply: () => applyPack(p.data) };
@@ -138,9 +195,14 @@ export function readFile(text) {
   return { kind: 'sauvegarde', title: `Sauvegarde du ${new Date(p.exportedAt).toLocaleString('fr-FR')}`, lines: [], apply: () => mergeBackup(p.data) };
 }
 
-export function exportJSON() {
+// La sauvegarde partagée est chiffrée avec ton identifiant et ton mot de passe.
+export async function exportJSON() {
   state.lastExport = now(); save();
-  return JSON.stringify({ app: 'mesaicosa', kind: 'sauvegarde', exportedAt: new Date().toISOString(), data: state });
+  const inner = JSON.stringify({ app: 'mesaicosa', kind: 'sauvegarde', exportedAt: new Date().toISOString(), data: state });
+  const salt = C.newSalt();
+  const k = await C.deriveKey(cred.user, cred.pass, salt, C.ITERATIONS);
+  const box = await C.encryptText(k, inner);
+  return JSON.stringify({ app: 'mesaicosa', kind: 'sauvegarde-chiffree', v: 1, salt, iter: C.ITERATIONS, ...box });
 }
 
 export function resetAll() { state = blank(); save(); }
