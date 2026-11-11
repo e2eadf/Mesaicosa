@@ -1,5 +1,8 @@
 // Textes originaux pour la dactylographie et la lecture rapide.
-export const TYPING_TEXTS = [
+import { MORE_TYPING } from './content-typing.js';
+import { MORE_READING } from './content-reading.js';
+
+const BASE_TYPING = [
   "Le temps est la seule ressource que l'on ne peut ni stocker ni racheter. Organiser sa semaine, c'est décider à l'avance de ce qui compte vraiment, puis protéger ces créneaux comme on protège un rendez-vous important.",
   "Un portefeuille diversifié répartit le risque entre plusieurs classes d'actifs : actions, obligations, immobilier et liquidités. L'objectif n'est pas d'éliminer la volatilité, mais de la rendre supportable sur la durée de placement choisie.",
   "Le Danube traverse dix pays avant de se jeter dans la mer Noire. Vienne, Bratislava, Budapest et Belgrade se sont développées sur ses rives, ce qui en fait le fleuve qui arrose le plus de capitales au monde.",
@@ -14,7 +17,7 @@ export const TYPING_TEXTS = [
   "Mens sana in corpore sano : un esprit sain dans un corps sain. La formule vient du poète latin Juvénal, qui l'employait pour dire ce qu'il est raisonnable de demander aux dieux.",
 ];
 
-export const READING_TEXTS = [
+const BASE_READING = [
   {
     id: 'interets', title: 'La magie des intérêts composés', theme: 'Finance',
     text: `Placer de l'argent à intérêts simples, c'est toucher chaque année le même montant, calculé sur la somme de départ. Avec les intérêts composés, les intérêts gagnés sont réinvestis et produisent à leur tour des intérêts. La différence paraît minime au début, puis elle devient spectaculaire avec le temps.
@@ -84,3 +87,6 @@ Pour celui qui veut progresser, la conclusion est pratique : répartir ses séan
     ],
   },
 ];
+
+export const TYPING_TEXTS = [...BASE_TYPING, ...MORE_TYPING];
+export const READING_TEXTS = [...BASE_READING, ...MORE_READING];

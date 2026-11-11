@@ -7,10 +7,20 @@ export function mount(el, api) {
   const TEXTS = [...READING_TEXTS, ...api.S.alive('readingTexts')];
   let timer = null, timeouts = [];
   const lastWpm = () => { const h = api.history().filter(s => s.details.mode === 'rsvp'); return h.length ? h[h.length - 1].details.wpm : 300; };
-  let opts = { mode: 'full', textId: TEXTS[0].id, wpm: lastWpm(), chunk: 1, custom: '' };
+  let opts = { mode: 'full', own: false, wpm: lastWpm(), chunk: 1, custom: '' };
+
+  // L'app choisit le texte : jamais lu d'abord, sinon le moins récemment lu.
+  function nextText() {
+    const lastRead = {};
+    api.history().forEach(s => { if (s.details.text) lastRead[s.details.text] = Math.max(lastRead[s.details.text] || 0, s.ts); });
+    const unread = TEXTS.filter(t => !lastRead[t.id]);
+    if (unread.length) return unread[Math.floor(Math.random() * unread.length)];
+    return TEXTS.slice().sort((a, b) => lastRead[a.id] - lastRead[b.id])[0];
+  }
+  let chosen = nextText();
 
   function intro() {
-    const done = new Set(api.history().map(s => s.details.text));
+    const readIds = new Set(api.history().map(s => s.details.text));
     const hist = api.history().slice(-6).reverse();
     el.innerHTML = `
       <div class="card" style="display:grid;gap:14px">
@@ -19,10 +29,10 @@ export function mount(el, api) {
             <button data-m="full" aria-pressed="${opts.mode === 'full'}">Texte chronométré</button>
             <button data-m="rsvp" aria-pressed="${opts.mode === 'rsvp'}">Défilement rapide</button></div>
           <p class="tiny muted" style="margin:6px 0 0">${opts.mode === 'full' ? 'Tu lis le texte entier à ton rythme, chronomètre lancé : c\'est la mesure de ta vraie vitesse.' : 'Les mots s\'affichent un à un au centre, sans mouvement des yeux : idéal pour pousser ta vitesse au-delà de ton confort.'}</p></div>
-        <div><label class="small muted" for="txt">Texte</label>
-          <select id="txt">${TEXTS.map(t => `<option value="${t.id}" ${t.id === opts.textId ? 'selected' : ''}>${esc(t.theme)} — ${esc(t.title)}${done.has(t.id) ? ' ✓' : ''}</option>`).join('')}
-          <option value="custom" ${opts.textId === 'custom' ? 'selected' : ''}>Mon propre texte (sans quiz)</option></select></div>
-        <div id="custom-wrap" style="display:${opts.textId === 'custom' ? 'block' : 'none'}">
+        <div class="small">${opts.own ? 'Ton propre texte (sans quiz)' : `Prochain texte : <b>${esc(chosen.theme)}</b> · ${words(chosen.text).length} mots, suivi d'un quiz`}
+          <div class="tiny muted">${TEXTS.filter(t => readIds.has(t.id)).length} texte(s) lu(s) sur ${TEXTS.length}</div></div>
+        <label class="row small" style="gap:6px"><input type="checkbox" id="own" ${opts.own ? 'checked' : ''}> Lire plutôt un texte à moi (article, chapitre…)</label>
+        <div id="custom-wrap" style="display:${opts.own ? 'block' : 'none'}">
           <textarea id="custom" placeholder="Colle ici un article ou un chapitre">${esc(opts.custom)}</textarea>
           <div class="tiny" style="color:var(--ko);display:none" id="custom-err">Colle d'abord un texte d'au moins 30 mots.</div></div>
         ${opts.mode === 'rsvp' ? `<div><label class="small muted" for="wpm">Vitesse : <b id="wpmv">${opts.wpm}</b> mots/min</label>
@@ -36,18 +46,18 @@ export function mount(el, api) {
         <p class="tiny muted">Score = vitesse × compréhension : lire vite sans retenir ne compte pas.</p>` : ''}`;
     el.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { opts.mode = b.dataset.m; keep(); intro(); });
     el.querySelectorAll('[data-c]').forEach(b => b.onclick = () => { opts.chunk = Number(b.dataset.c); el.querySelectorAll('[data-c]').forEach(x => x.setAttribute('aria-pressed', x === b)); });
-    el.querySelector('#txt').onchange = e => { opts.textId = e.target.value; el.querySelector('#custom-wrap').style.display = opts.textId === 'custom' ? 'block' : 'none'; };
+    el.querySelector('#own').onchange = e => { keep(); opts.own = e.target.checked; intro(); };
     const wpm = el.querySelector('#wpm');
     if (wpm) wpm.oninput = () => { opts.wpm = Number(wpm.value); el.querySelector('#wpmv').textContent = opts.wpm; };
     el.querySelector('#custom').oninput = () => { el.querySelector('#custom-err').style.display = 'none'; };
     el.querySelector('#go').onclick = () => {
       keep();
-      if (opts.textId === 'custom' && words(opts.custom).length < 30) { el.querySelector('#custom-err').style.display = 'block'; return; }
+      if (opts.own && words(opts.custom).length < 30) { el.querySelector('#custom-err').style.display = 'block'; return; }
       opts.mode === 'rsvp' ? rsvp() : full();
     };
   }
-  function keep() { const c = el.querySelector('#custom'); if (c) opts.custom = c.value; const t = el.querySelector('#txt'); if (t) opts.textId = t.value; }
-  function current() { return opts.textId === 'custom' ? { id: 'custom', title: 'Mon texte', text: opts.custom, quiz: null } : TEXTS.find(t => t.id === opts.textId); }
+  function keep() { const c = el.querySelector('#custom'); if (c) opts.custom = c.value; }
+  function current() { return opts.own ? { id: 'custom', title: 'Mon texte', text: opts.custom, quiz: null } : chosen; }
 
   // --- lecture complète chronométrée
   function full() {
@@ -109,7 +119,7 @@ export function mount(el, api) {
       el.innerHTML = `<div class="card" style="text-align:center;border-color:var(--ok)"><h3>${wpm} mots/min</h3>
         <p class="small muted">Pas de quiz pour un texte personnel : résume-le en une phrase à voix haute pour vérifier ta compréhension.</p>
         <button class="btn primary" id="again">Autre lecture</button></div>`;
-      el.querySelector('#again').onclick = intro; return;
+      el.querySelector('#again').onclick = () => { chosen = nextText(); intro(); }; return;
     }
     let k = 0, good = 0;
     const show = () => {
@@ -134,8 +144,8 @@ export function mount(el, api) {
       el.innerHTML = `<div class="card" style="text-align:center;border-color:var(--ok)">
         <h3>${wpm} mots/min · ${comp} % de compréhension</h3><p>Score : <b>${score}</b></p>
         <p class="small muted">${advice} Pour repère, un adulte lit en moyenne entre 200 et 300 mots/min.</p>
-        <button class="btn primary" id="again">Autre lecture</button></div>`;
-      el.querySelector('#again').onclick = intro;
+        <button class="btn primary" id="again">Lecture suivante</button></div>`;
+      el.querySelector('#again').onclick = () => { chosen = nextText(); intro(); };
     };
     show();
   }

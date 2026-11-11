@@ -410,9 +410,11 @@ function viewData() {
     ${S.isMemoryOnly() ? `<div class="card" style="border-color:var(--ko);margin-bottom:12px"><b>Stockage indisponible.</b> Ce navigateur bloque l'enregistrement local : tes données seront perdues à la fermeture. Ouvre l'app depuis son adresse habituelle, hors navigation privée.</div>` : ''}
     <div class="grid">
       <div class="card"><h3>Envoyer vers l'autre appareil</h3>
-        <p class="small muted">Dernier export : ${fmt(st.lastExport)}</p>
-        <div class="row"><button class="btn primary" id="share">Partager mes données</button>
-        <button class="btn" id="dl">Télécharger le fichier</button></div></div>
+        <p class="small muted">Dernier export : <span id="last-exp">${fmt(st.lastExport)}</span></p>
+        ${canShareFiles() ? `<div class="row"><button class="btn primary" id="share">Partager mes données</button>
+        <button class="btn" id="dl">Télécharger le fichier</button></div>`
+        : `<div class="row"><button class="btn primary" id="dl">Télécharger mes données</button></div>
+        <p class="tiny muted">Puis, dans Téléchargements : clic droit sur le fichier → Envoyer avec Quick Share.</p>`}</div>
       <div class="card"><h3>Importer</h3>
         <p class="small muted">Une sauvegarde de ton autre appareil, ou un paquet préparé par Claude (semaine type, objectifs, textes…). Dernier import : ${fmt(st.lastImport)}</p>
         <label class="btn primary" for="imp">Choisir un fichier</label>
@@ -443,20 +445,21 @@ function viewData() {
     <h2>Zone sensible</h2>
     <div class="card"><p class="small" style="margin-top:0">Effacer toutes les données de cet appareil. Pense à exporter avant.</p>
       <button class="btn" id="reset">Tout effacer…</button><div id="reset-confirm"></div></div>
-    <p class="tiny muted" style="margin-top:24px">MESAICOSA v1.3 · Mens sana in corpore sano</p>
+    <p class="tiny muted" style="margin-top:24px">MESAICOSA v1.4 · Mens sana in corpore sano</p>
   `);
   const fileName = () => `mesaicosa-${today()}.json`;
   const download = async () => {
     const blob = new Blob([await S.exportJSON()], { type: 'application/json' });
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fileName(); a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 2000); toast('Fichier téléchargé');
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000); toast('Fichier téléchargé'); refreshExp();
   };
+  const refreshExp = () => { const e = document.getElementById('last-exp'); if (e) e.textContent = fmt(S.get().lastExport); };
   document.getElementById('dl').onclick = download;
   document.getElementById('lock-now').onclick = lockApp;
-  document.getElementById('share').onclick = async () => {
+  if (document.getElementById('share')) document.getElementById('share').onclick = async () => {
     const file = new File([await S.exportJSON()], fileName(), { type: 'application/json' });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      try { await navigator.share({ files: [file], title: 'Sauvegarde MESAICOSA' }); toast('Sauvegarde partagée'); }
+      try { await navigator.share({ files: [file], title: 'Sauvegarde MESAICOSA' }); toast('Sauvegarde partagée'); refreshExp(); }
       catch (e) { if (e.name !== 'AbortError') download(); }
     } else download();
   };
@@ -611,6 +614,7 @@ function gate() {
   };
   draw();
 }
+const canShareFiles = () => { try { return !!(navigator.canShare && navigator.canShare({ files: [new File(['x'], 'x.json', { type: 'application/json' })] })); } catch { return false; } };
 const isCryptoOK = () => !!(globalThis.crypto && crypto.subtle) && window.isSecureContext;
 
 function exportReminder() {

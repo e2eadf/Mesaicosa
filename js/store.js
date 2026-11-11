@@ -18,7 +18,8 @@ function blank() {
     reviews: [],     // {id, week, wins, blocks, focus, t}
     typingTexts: [], // {id, text, deleted, t}
     readingTexts: [],// {id, title, theme, text, quiz, deleted, t}
-    geo: {},         // countryId -> {ok, ko, t}
+    geo: {},         // ancien format (avant v1.4)
+    geo2: {},        // countryId -> {deviceId: {ok, ko}} : additionné entre appareils
     lastExport: 0,
     lastImport: 0,
   };
@@ -55,6 +56,7 @@ export async function setup(user, pass) {
   // reprise des données d'une version précédente non chiffrée
   const raw = readLS(KEY);
   try { state = raw ? { ...blank(), ...JSON.parse(raw) } : blank(); } catch { state = blank(); }
+  migrate();
   await persist();
   removeLS(KEY);
 }
@@ -66,6 +68,7 @@ export async function unlock(user, pass) {
   try { text = await C.decryptText(k, v); } catch { throw new Error('Identifiant ou mot de passe incorrect.'); }
   key = k; cred = { user, pass }; vaultMeta = { salt: v.salt, iter: v.iter };
   state = { ...blank(), ...JSON.parse(text) };
+  migrate();
 }
 
 export async function changeCredentials(oldPass, newUser, newPass) {
@@ -116,9 +119,27 @@ export function sessionsOf(module) {
 }
 
 export function geoMark(id, ok) {
-  const r = state.geo[id] || { ok: 0, ko: 0 };
-  state.geo[id] = { ok: r.ok + (ok ? 1 : 0), ko: r.ko + (ok ? 0 : 1), t: now() };
+  const per = state.geo2[id] ||= {};
+  const r = per[state.deviceId] || { ok: 0, ko: 0 };
+  per[state.deviceId] = { ok: r.ok + (ok ? 1 : 0), ko: r.ko + (ok ? 0 : 1) };
   save();
+}
+// Statistiques d'un pays, tous appareils confondus
+export function geoStats() {
+  const out = {};
+  for (const id in state.geo2) {
+    let ok = 0, ko = 0;
+    for (const d in state.geo2[id]) { ok += state.geo2[id][d].ok; ko += state.geo2[id][d].ko; }
+    out[id] = { ok, ko };
+  }
+  return out;
+}
+function migrate() {
+  state.geo2 ||= {};
+  if (state.geo && Object.keys(state.geo).length && !Object.keys(state.geo2).length) {
+    for (const id in state.geo) state.geo2[id] = { [state.deviceId]: { ok: state.geo[id].ok || 0, ko: state.geo[id].ko || 0 } };
+    state.geo = {};
+  }
 }
 
 // --- fusion
@@ -140,9 +161,17 @@ function mergeBackup(inc) {
   for (const k of MAPS) state[k] = mergeMap(state[k], inc[k]);
   for (const k of LISTS) state[k] = mergeList(state[k], inc[k]);
   if (inc.template && (!state.template || (inc.template.t || 0) > (state.template.t || 0))) state.template = inc.template;
+  // ancien format reçu d'un appareil non encore mis à jour : rattaché à un appareil fictif
   for (const id in inc.geo || {}) {
-    const a = state.geo[id] || { ok: 0, ko: 0, t: 0 }, b = inc.geo[id];
-    state.geo[id] = { ok: Math.max(a.ok, b.ok), ko: Math.max(a.ko, b.ko), t: Math.max(a.t || 0, b.t || 0) };
+    const per = state.geo2[id] ||= {}; const r = inc.geo[id], dv = 'ancien-' + (inc.deviceId || 'x');
+    per[dv] = { ok: Math.max(per[dv]?.ok || 0, r.ok || 0), ko: Math.max(per[dv]?.ko || 0, r.ko || 0) };
+  }
+  for (const id in inc.geo2 || {}) {
+    const per = state.geo2[id] ||= {};
+    for (const dv in inc.geo2[id]) {
+      const a = per[dv] || { ok: 0, ko: 0 }, b = inc.geo2[id][dv];
+      per[dv] = { ok: Math.max(a.ok, b.ok), ko: Math.max(a.ko, b.ko) };
+    }
   }
   state.lastImport = now();
   save();

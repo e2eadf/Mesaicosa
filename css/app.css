@@ -163,3 +163,20 @@ body.locked .tabbar{display:none}
 body.locked{padding-left:0!important}
 .lockcard{max-width:420px;margin:8vh auto 0;display:grid;gap:10px}
 .lockcard h1{text-align:center}
+.map-wrap path.land.sel,.map-wrap circle.land.sel{fill:var(--proj)!important;stroke:var(--ink);stroke-width:1.2}
+/* clavier à l'écran */
+.kb{display:grid;gap:4px;margin-top:12px;user-select:none;font-size:12px}
+.kb .krow{display:flex;gap:4px}
+.kb .k{flex:1 1 0;min-width:0;height:34px;border-radius:6px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+  position:relative;color:var(--muted);background:var(--card)}
+.kb .k .sh{position:absolute;top:1px;left:4px;font-size:10px;opacity:.7}
+.kb .k.wide{flex-grow:1.6}.kb .k.space{flex-grow:7}
+.kb .k.f-lp,.kb .k.f-rp{background:color-mix(in srgb,var(--perso-bg) 70%,var(--card))}
+.kb .k.f-lr,.kb .k.f-rr{background:color-mix(in srgb,var(--spi-bg) 70%,var(--card))}
+.kb .k.f-lm,.kb .k.f-rm{background:color-mix(in srgb,var(--sport-bg) 70%,var(--card))}
+.kb .k.f-li,.kb .k.f-ri{background:color-mix(in srgb,var(--proj-bg) 70%,var(--card))}
+.kb .k.home::after{content:"";position:absolute;bottom:4px;width:8px;height:2px;background:var(--muted);border-radius:2px}
+.kb .k.next{background:var(--accent)!important;color:#fff;border-color:var(--accent);font-weight:700}
+.kb .k.then{outline:2px dashed var(--accent);outline-offset:-3px;color:var(--accent)}
+.kb-hint{font-size:13px;text-align:center;margin-top:6px;min-height:20px}
+@media (max-width:560px){.kb{display:none}}
