@@ -6,7 +6,7 @@ export function mount(el, api) {
   const { esc } = api;
   const TEXTS = [...READING_TEXTS, ...api.S.alive('readingTexts')];
   let timer = null, timeouts = [];
-  const lastWpm = () => { const h = api.history().filter(s => s.details.mode === 'rsvp'); return h.length ? h[h.length - 1].details.wpm : 300; };
+  const lastWpm = () => { const h = api.history().filter(s => s.details.mode === 'scroll' || s.details.mode === 'rsvp'); return h.length ? h[h.length - 1].details.wpm : 300; };
   let opts = { mode: 'full', own: false, wpm: lastWpm(), chunk: 1, custom: '' };
 
   // L'app choisit le texte : jamais lu d'abord, sinon le moins récemment lu.
@@ -27,33 +27,30 @@ export function mount(el, api) {
         <div><div class="small muted" style="margin-bottom:6px">Méthode</div>
           <div class="seg" role="group" aria-label="Méthode">
             <button data-m="full" aria-pressed="${opts.mode === 'full'}">Texte chronométré</button>
-            <button data-m="rsvp" aria-pressed="${opts.mode === 'rsvp'}">Défilement rapide</button></div>
-          <p class="tiny muted" style="margin:6px 0 0">${opts.mode === 'full' ? 'Tu lis le texte entier à ton rythme, chronomètre lancé : c\'est la mesure de ta vraie vitesse.' : 'Les mots s\'affichent un à un au centre, sans mouvement des yeux : idéal pour pousser ta vitesse au-delà de ton confort.'}</p></div>
+            <button data-m="scroll" aria-pressed="${opts.mode === 'scroll'}">Texte qui défile</button></div>
+          <p class="tiny muted" style="margin:6px 0 0">${opts.mode === 'full' ? 'Tu lis le texte entier à ton rythme, chronomètre lancé : c\'est la mesure de ta vraie vitesse.' : 'Le texte défile à la vitesse choisie : suis la bande de lecture sans revenir en arrière. Idéal pour pousser ta vitesse au-delà de ton confort.'}</p></div>
         <div class="small">${opts.own ? 'Ton propre texte (sans quiz)' : `Prochain texte : <b>${esc(chosen.theme)}</b> · ${words(chosen.text).length} mots, suivi d'un quiz`}
           <div class="tiny muted">${TEXTS.filter(t => readIds.has(t.id)).length} texte(s) lu(s) sur ${TEXTS.length}</div></div>
         <label class="row small" style="gap:6px"><input type="checkbox" id="own" ${opts.own ? 'checked' : ''}> Lire plutôt un texte à moi (article, chapitre…)</label>
         <div id="custom-wrap" style="display:${opts.own ? 'block' : 'none'}">
           <textarea id="custom" placeholder="Colle ici un article ou un chapitre">${esc(opts.custom)}</textarea>
           <div class="tiny" style="color:var(--ko);display:none" id="custom-err">Colle d'abord un texte d'au moins 30 mots.</div></div>
-        ${opts.mode === 'rsvp' ? `<div><label class="small muted" for="wpm">Vitesse : <b id="wpmv">${opts.wpm}</b> mots/min</label>
-          <input type="range" id="wpm" min="150" max="900" step="25" value="${opts.wpm}" style="width:100%"></div>
-          <div><span class="small muted">Mots par affichage</span>
-          <div class="seg" role="group" aria-label="Mots par affichage">${[1, 2, 3].map(n => `<button data-c="${n}" aria-pressed="${opts.chunk === n}">${n}</button>`).join('')}</div></div>` : ''}
+        ${opts.mode === 'scroll' ? `<div><label class="small muted" for="wpm">Vitesse de départ : <b id="wpmv">${opts.wpm}</b> mots/min</label>
+          <input type="range" id="wpm" min="100" max="900" step="25" value="${opts.wpm}" style="width:100%"></div>` : ''}
         <div><button class="btn primary" id="go">Commencer</button></div>
       </div>
       ${hist.length ? `<h2>Dernières séances</h2><table class="hist"><tr><th>Date</th><th>Méthode</th><th>Vitesse</th><th>Compréhension</th><th>Score</th></tr>
-        ${hist.map(s => `<tr><td>${esc(s.date)}</td><td>${s.details.mode === 'rsvp' ? 'Défilement' : 'Chrono'}</td><td>${s.details.wpm}</td><td>${s.details.comp == null ? '—' : s.details.comp + ' %'}</td><td>${s.score}</td></tr>`).join('')}</table>
+        ${hist.map(s => `<tr><td>${esc(s.date)}</td><td>${s.details.mode === 'scroll' ? 'Défilement' : s.details.mode === 'rsvp' ? 'Mot à mot' : 'Chrono'}</td><td>${s.details.wpm}</td><td>${s.details.comp == null ? '—' : s.details.comp + ' %'}</td><td>${s.score}</td></tr>`).join('')}</table>
         <p class="tiny muted">Score = vitesse × compréhension : lire vite sans retenir ne compte pas.</p>` : ''}`;
     el.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { opts.mode = b.dataset.m; keep(); intro(); });
-    el.querySelectorAll('[data-c]').forEach(b => b.onclick = () => { opts.chunk = Number(b.dataset.c); el.querySelectorAll('[data-c]').forEach(x => x.setAttribute('aria-pressed', x === b)); });
-    el.querySelector('#own').onchange = e => { keep(); opts.own = e.target.checked; intro(); };
+        el.querySelector('#own').onchange = e => { keep(); opts.own = e.target.checked; intro(); };
     const wpm = el.querySelector('#wpm');
     if (wpm) wpm.oninput = () => { opts.wpm = Number(wpm.value); el.querySelector('#wpmv').textContent = opts.wpm; };
     el.querySelector('#custom').oninput = () => { el.querySelector('#custom-err').style.display = 'none'; };
     el.querySelector('#go').onclick = () => {
       keep();
       if (opts.own && words(opts.custom).length < 30) { el.querySelector('#custom-err').style.display = 'block'; return; }
-      opts.mode === 'rsvp' ? rsvp() : full();
+      opts.mode === 'scroll' ? scroll() : full();
     };
   }
   function keep() { const c = el.querySelector('#custom'); if (c) opts.custom = c.value; }
@@ -76,39 +73,42 @@ export function mount(el, api) {
     };
   }
 
-  // --- défilement RSVP
-  function rsvp() {
-    const T = current(), w = words(T.text), chunks = [];
-    for (let i = 0; i < w.length; i += opts.chunk) chunks.push(w.slice(i, i + opts.chunk).join(' '));
-    let i = 0, paused = false, t0 = 0, pausedMs = 0, pauseStart = 0;
-    el.innerHTML = `<div class="rsvp" id="rv" aria-live="off">Prêt ?</div>
-      <div class="progress" style="margin:10px 0"><span id="pg" style="width:0"></span></div>
-      <div class="row" style="justify-content:center"><button class="btn" id="pp">Pause</button><button class="btn ghost" id="stop">Arrêter</button></div>
-      <p class="tiny muted" style="text-align:center">${opts.wpm} mots/min · touche la zone de texte ou la barre d'espace pour mettre en pause</p>`;
-    const rv = el.querySelector('#rv');
-    const orp = word => { const k = Math.max(0, Math.min(word.length - 1, Math.floor((word.length - 1) * 0.35))); return `${esc(word.slice(0, k))}<span class="orp">${esc(word[k] || '')}</span>${esc(word.slice(k + 1))}`; };
-    const show = c => { rv.innerHTML = opts.chunk === 1 ? orp(c) : esc(c); };
-    const step = () => {
+  // --- texte qui défile en continu, à vitesse réglable (bande de lecture au tiers supérieur)
+  function scroll() {
+    const T = current(), n = words(T.text).length;
+    let wpm = opts.wpm, paused = true, started = false, offset = 0, last = 0, activeMs = 0, raf = 0;
+    el.innerHTML = `<div class="spread small" style="margin-bottom:8px"><span>Vitesse <b id="sv">${wpm}</b> mots/min</span><span id="sp">0 %</span></div>
+      <div class="scroller" id="sc" aria-label="Texte qui défile"><div class="inner" id="si">${T.text.split('\n').map(p => `<p>${esc(p)}</p>`).join('')}</div>
+        <div class="band"></div><div class="fade-t"></div><div class="fade-b"></div></div>
+      <div class="row" style="justify-content:center;margin-top:10px">
+        <button class="btn" id="slow" aria-label="Ralentir">− 25</button><button class="btn primary" id="pp">Démarrer</button><button class="btn" id="fast" aria-label="Accélérer">+ 25</button>
+        <button class="btn ghost" id="stop">Arrêter</button></div>
+      <p class="tiny muted" style="text-align:center">Lis la ligne qui passe dans la bande bleue. Touche le texte ou appuie sur Espace pour mettre en pause ; ajuste la vitesse en direct.</p>`;
+    const sc = el.querySelector('#sc'), si = el.querySelector('#si');
+    const startY = sc.clientHeight * 0.32;                 // le texte commence dans la bande
+    const total = () => si.scrollHeight;                   // hauteur du texte
+    const pxPerMs = () => total() / (n / wpm * 60000);     // parcourir tout le texte en n/wpm minutes
+    const place = () => { si.style.transform = `translateY(${startY - offset}px)`; el.querySelector('#sp').textContent = `${Math.min(100, Math.round(100 * offset / total()))} %`; };
+    const frame = t => {
       if (paused) return;
-      if (i >= chunks.length) { const wpm = Math.round(w.length / ((Date.now() - t0 - pausedMs) / 60000)); return quiz(T, Math.min(wpm, opts.wpm), 'rsvp'); }
-      const c = chunks[i++]; show(c);
-      el.querySelector('#pg').style.width = `${Math.round(100 * i / chunks.length)}%`;
-      let ms = 60000 / opts.wpm * opts.chunk;
-      if (/[.!?…]$/.test(c)) ms *= 2; else if (/[,;:]$/.test(c)) ms *= 1.5;
-      if (c.length > 12 && opts.chunk === 1) ms *= 1.2;
-      timer = setTimeout(step, ms);
+      const dt = last ? t - last : 0; last = t; activeMs += dt;
+      offset += dt * pxPerMs(); place();
+      if (offset >= total()) { cancelAnimationFrame(raf); return quiz(T, Math.round(n / (activeMs / 60000)), 'scroll'); }
+      raf = requestAnimationFrame(frame);
     };
     const toggle = () => {
-      paused = !paused; el.querySelector('#pp').textContent = paused ? 'Reprendre' : 'Pause';
-      if (paused) { pauseStart = Date.now(); clearTimeout(timer); } else { pausedMs += Date.now() - pauseStart; step(); }
+      paused = !paused; started = true;
+      el.querySelector('#pp').textContent = paused ? 'Reprendre' : 'Pause';
+      if (!paused) { last = 0; raf = requestAnimationFrame(frame); } else cancelAnimationFrame(raf);
     };
-    el.querySelector('#pp').onclick = toggle; rv.onclick = toggle;
-    const key = e => { if (e.code === 'Space' && el.contains(rv)) { e.preventDefault(); toggle(); } };
-    document.addEventListener('keydown', key); timeouts.push(() => document.removeEventListener('keydown', key));
-    el.querySelector('#stop').onclick = () => { clearTimeout(timer); intro(); };
-    let n = 3; rv.textContent = n;
-    const cd = () => { n--; if (n > 0) { rv.textContent = n; timer = setTimeout(cd, 700); } else { t0 = Date.now(); step(); } };
-    timer = setTimeout(cd, 700);
+    const setW = d => { wpm = Math.max(100, Math.min(900, wpm + d)); opts.wpm = wpm; el.querySelector('#sv').textContent = wpm; };
+    el.querySelector('#pp').onclick = toggle; sc.onclick = toggle;
+    el.querySelector('#slow').onclick = () => setW(-25); el.querySelector('#fast').onclick = () => setW(25);
+    const key = e => { if (!el.contains(sc)) return; if (e.code === 'Space') { e.preventDefault(); toggle(); } else if (e.key === 'ArrowUp' || e.key === 'ArrowRight') setW(25); else if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') setW(-25); };
+    document.addEventListener('keydown', key);
+    timeouts.push(() => { document.removeEventListener('keydown', key); cancelAnimationFrame(raf); });
+    el.querySelector('#stop').onclick = () => { cancelAnimationFrame(raf); intro(); };
+    place();
   }
 
   // --- questionnaire
@@ -139,8 +139,8 @@ export function mount(el, api) {
       const comp = Math.round(100 * good / T.quiz.length), score = Math.round(wpm * comp / 100);
       api.save(score, 'pts', { mode, wpm, comp, text: T.id });
       const advice = comp < 75 ? 'Compréhension insuffisante : ralentis un peu la prochaine fois.'
-        : (mode === 'rsvp' ? `Bonne compréhension : essaie ${Math.min(900, wpm + 50)} mots/min la prochaine fois.` : 'Bonne compréhension : essaie de lire un peu plus vite la prochaine fois.');
-      if (mode === 'rsvp' && comp >= 75) opts.wpm = Math.min(900, wpm + 50);
+        : (mode === 'scroll' ? `Bonne compréhension : essaie ${Math.min(900, wpm + 50)} mots/min la prochaine fois.` : 'Bonne compréhension : essaie de lire un peu plus vite la prochaine fois.');
+      if (mode === 'scroll' && comp >= 75) opts.wpm = Math.min(900, wpm + 50);
       el.innerHTML = `<div class="card" style="text-align:center;border-color:var(--ok)">
         <h3>${wpm} mots/min · ${comp} % de compréhension</h3><p>Score : <b>${score}</b></p>
         <p class="small muted">${advice} Pour repère, un adulte lit en moyenne entre 200 et 300 mots/min.</p>

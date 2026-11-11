@@ -128,8 +128,8 @@ input:focus,select:focus,textarea:focus,.btn:focus-visible{outline:2px solid var
 .map-wrap svg{display:block;width:100%;height:auto}
 .map-wrap path.land{fill:var(--vie-bg);stroke:var(--faint);stroke-width:.4;vector-effect:non-scaling-stroke;cursor:pointer}
 .map-wrap path.land.off{fill:var(--bg);opacity:.5;cursor:default}
-.map-wrap path.land:hover:not(.off){fill:var(--accent-bg)}
-.map-wrap path.land.good{fill:var(--ok)}.map-wrap path.land.bad{fill:var(--ko)}.map-wrap path.land.target{fill:var(--accent)}
+.map-wrap path.land:hover:not(.off):not(.good):not(.bad):not(.target):not(.sel){fill:var(--accent-bg)}
+.map-wrap .land.good{fill:var(--ok)!important}.map-wrap .land.bad{fill:var(--ko)!important}.map-wrap .land.target{fill:var(--accent)!important}
 .map-wrap path.sea{fill:var(--accent-bg);opacity:.35}
 .map-tools{position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:6px}
 .map-tools .btn{width:36px;min-height:36px;padding:0;background:var(--card)}
@@ -180,3 +180,12 @@ body.locked{padding-left:0!important}
 .kb .k.then{outline:2px dashed var(--accent);outline-offset:-3px;color:var(--accent)}
 .kb-hint{font-size:13px;text-align:center;margin-top:6px;min-height:20px}
 @media (max-width:560px){.kb{display:none}}
+
+/* lecture : texte qui défile */
+.scroller{position:relative;height:min(52vh,380px);overflow:hidden;background:var(--card);border:1px solid var(--line);border-radius:12px;cursor:pointer}
+.scroller .inner{position:absolute;z-index:1;left:0;right:0;top:0;padding:0 18px;font-size:20px;line-height:1.75;will-change:transform}
+.scroller .inner p{margin:0 0 .9em}
+.scroller .band{position:absolute;left:0;right:0;top:32%;height:3.6em;z-index:0;background:var(--accent-bg);pointer-events:none;border-top:1px solid var(--accent);border-bottom:1px solid var(--accent)}
+.scroller .fade-t,.scroller .fade-b{position:absolute;left:0;right:0;height:22%;pointer-events:none;z-index:2}
+.scroller .fade-t{top:0;background:linear-gradient(var(--card),transparent)}
+.scroller .fade-b{bottom:0;background:linear-gradient(transparent,var(--card))}

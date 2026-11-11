@@ -452,7 +452,7 @@ function viewData() {
     <h2>Zone sensible</h2>
     <div class="card"><p class="small" style="margin-top:0">Effacer toutes les données de cet appareil. Pense à exporter avant.</p>
       <button class="btn" id="reset">Tout effacer…</button><div id="reset-confirm"></div></div>
-    <p class="tiny muted" style="margin-top:24px">MESAICOSA v1.4.1 · Mens sana in corpore sano</p>
+    <p class="tiny muted" style="margin-top:24px">MESAICOSA v1.4.2 · Mens sana in corpore sano</p>
   `);
   const fileName = () => `mesaicosa-${today()}.json`;
   const download = async () => {
