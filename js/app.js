@@ -2,6 +2,7 @@ import * as S from './store.js';
 import { CATS, MODULES, minutes, blocksFor, sleepFor, isWeekday, templateDay, variantFor, overrideFor } from './schedule.js';
 import { mountEditor } from './editor.js';
 
+export const APP_VERSION = '1.5.1';
 const view = document.getElementById('view');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const today = () => S.isoDate(new Date());
@@ -122,7 +123,7 @@ function viewDay(date, mode) {
 
 // ---------------------------------------------------------------- Semaine type
 function viewTemplate(dowArg, variantArg) {
-  let tpl = S.template() || { days: {} };
+  let tpl = structuredClone(S.template() || { days: {} });
   const dow = Number.isInteger(Number(dowArg)) && dowArg !== undefined ? Number(dowArg) % 7 : 1;
   tpl.days[dow] ??= { wake: '07:00', bed: '23:00', office: [], tt: null };
   const day = tpl.days[dow];
@@ -456,7 +457,11 @@ function viewData() {
     <h2>Zone sensible</h2>
     <div class="card"><p class="small" style="margin-top:0">Effacer toutes les données de cet appareil. Pense à exporter avant.</p>
       <button class="btn" id="reset">Tout effacer…</button><div id="reset-confirm"></div></div>
-    <p class="tiny muted" style="margin-top:24px">MESAICOSA v1.5 · Mens sana in corpore sano</p>
+    <h2>Version</h2>
+    <div class="card"><div class="spread"><span>MESAICOSA <b>v${APP_VERSION}</b></span><button class="btn small" id="upd-check">Vérifier les mises à jour</button></div>
+      <div class="small" id="upd-msg" style="margin-top:6px"></div>
+      <p class="tiny muted" style="margin-bottom:0">L'app vérifie aussi toute seule à chaque ouverture, à chaque retour dessus et toutes les heures.</p></div>
+    <p class="tiny muted" style="margin-top:24px">Mens sana in corpore sano</p>
   `);
   const fileName = () => `mesaicosa-${today()}.json`;
   const download = async () => {
@@ -467,6 +472,14 @@ function viewData() {
   const refreshExp = () => { const e = document.getElementById('last-exp'); if (e) e.textContent = fmt(S.get().lastExport); };
   document.getElementById('dl').onclick = download;
   view.querySelectorAll('[data-theme-opt]').forEach(b => b.onclick = () => applyTheme(b.dataset.themeOpt));
+  document.getElementById('upd-check').onclick = async () => {
+    const m = document.getElementById('upd-msg');
+    m.innerHTML = '<span class="muted">Vérification…</span>';
+    const r = await checkUpdate();
+    m.innerHTML = r === 'found' ? '<span class="feedback-ok">Nouvelle version trouvée : installation… Un bandeau te proposera de recharger.</span>'
+      : r === 'latest' ? '<span class="feedback-ok">Tu as la dernière version.</span>'
+      : '<span class="feedback-ko">Vérification impossible (pas de réseau ?). Réessaie plus tard.</span>';
+  };
   document.getElementById('lock-now').onclick = lockApp;
   if (document.getElementById('share')) document.getElementById('share').onclick = async () => {
     const file = new File([await S.exportJSON()], fileName(), { type: 'application/json' });
@@ -657,9 +670,20 @@ function exportReminder() {
 
 gate();
 
+let swReg = null;
+async function checkUpdate() {
+  if (!swReg) return 'error';
+  try {
+    await swReg.update();
+    return swReg.installing || swReg.waiting ? 'found' : 'latest';
+  } catch { return 'error'; }
+}
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   const hadController = !!navigator.serviceWorker.controller;
-  navigator.serviceWorker.register('sw.js').catch(() => {});
+  navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(r => { swReg = r; r.update().catch(() => {}); }).catch(() => {});
+  // vérification automatique : au retour sur l'app et toutes les heures
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) swReg?.update().catch(() => {}); });
+  setInterval(() => swReg?.update().catch(() => {}), 60 * 60 * 1000);
   // Une nouvelle version vient d'être installée : on propose de recharger pour ne pas mélanger les versions
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     if (!hadController || document.getElementById('upd')) return;

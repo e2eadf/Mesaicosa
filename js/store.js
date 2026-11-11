@@ -98,7 +98,26 @@ export function delMap(map, key) { state[map][key] = { v: null, t: now() }; save
 export function getMap(map, key, dflt) { const r = state[map][key]; return r && r.v !== null && r.v !== undefined ? r.v : dflt; }
 
 export function template() { return state.template?.v || null; }
-export function setTemplate(v) { state.template = { v, t: now() }; save(); }
+// La semaine type est datée jour par jour, pour fusionner finement entre appareils
+export function setTemplate(v) {
+  const old = state.template?.v, t = now();
+  const dt = { ...(state.template?.dt || {}) };
+  for (let d = 0; d < 7; d++) if (JSON.stringify(old?.days?.[d] ?? null) !== JSON.stringify(v?.days?.[d] ?? null)) dt[d] = t;
+  state.template = { v: structuredClone(v), t, dt };
+  save();
+}
+function mergeTemplate(a, b) {
+  if (!a) return b; if (!b) return a;
+  const dayT = (x, d) => x.dt?.[d] ?? x.t ?? 0;
+  const out = { v: { ...(a.v || {}), days: {} }, t: Math.max(a.t || 0, b.t || 0), dt: {} };
+  for (let d = 0; d < 7; d++) {
+    const win = dayT(b, d) > dayT(a, d) ? b : a;
+    const day = win.v?.days?.[d] ?? (win === a ? b : a).v?.days?.[d];
+    if (day !== undefined) out.v.days[d] = day;
+    out.dt[d] = Math.max(dayT(a, d), dayT(b, d));
+  }
+  return out;
+}
 
 export function upsert(list, item) {
   const arr = state[list];
@@ -160,7 +179,7 @@ function mergeBackup(inc) {
   const before = state.sessions.length;
   for (const k of MAPS) state[k] = mergeMap(state[k], inc[k]);
   for (const k of LISTS) state[k] = mergeList(state[k], inc[k]);
-  if (inc.template && (!state.template || (inc.template.t || 0) > (state.template.t || 0))) state.template = inc.template;
+  if (inc.template) state.template = mergeTemplate(state.template, inc.template);
   // ancien format reçu d'un appareil non encore mis à jour : rattaché à un appareil fictif
   for (const id in inc.geo || {}) {
     const per = state.geo2[id] ||= {}; const r = inc.geo[id], dv = 'ancien-' + (inc.deviceId || 'x');
@@ -193,7 +212,7 @@ function packSummary(d) {
 }
 function applyPack(d) {
   const t = now();
-  if (d.template) state.template = { v: d.template, t };
+  if (d.template) state.template = { v: d.template, t, dt: Object.fromEntries([0, 1, 2, 3, 4, 5, 6].map(i => [i, t])) };
   for (const date in d.days || {}) state.overrides[date] = { v: d.days[date], t };
   for (const date in d.tt || {}) state.tt[date] = { v: !!d.tt[date], t };
   for (const k in d.weights || {}) state.weights[k] = { v: d.weights[k], t };
