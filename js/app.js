@@ -278,15 +278,22 @@ async function viewExercise(id) {
   const m = MODULES[id];
   if (!m || !m.ready) { location.hash = '#gymnase'; return; }
   render(`<div class="ex"><div class="ex-head"><a class="btn" href="#gymnase" aria-label="Retour au Gymnase">‹</a><h1>${m.icon} ${esc(m.name)}</h1></div><div id="ex-body"><p class="muted">Chargement…</p></div></div>`);
-  const mod = await import(`./modules/${id}.js`);
   const body = document.getElementById('ex-body');
+  let mod;
+  try { mod = await import(`./modules/${id}.js`); }
+  catch { body.innerHTML = updateMsg(); return; }
   const api = {
     S, esc, toast,
     save(score, unit, details) { S.addSession(id, score, unit, details); },
     history: () => S.sessionsOf(id),
   };
-  cleanup = mod.mount(body, api) || null;
+  try { cleanup = mod.mount(body, api) || null; }
+  catch { body.innerHTML = updateMsg(); }
 }
+const updateMsg = () => `<div class="card" style="border-color:var(--ko)"><b>Mise à jour incomplète.</b>
+  <p class="small">L'app vient d'être mise à jour mais une partie de l'ancienne version est encore en mémoire. Recharge-la pour terminer la mise à jour.</p>
+  <button class="btn primary" onclick="location.reload()">Recharger l'app</button></div>`;
+window.addEventListener('unhandledrejection', e => { if (/is not a function|Failed to fetch dynamically|Importing a module/i.test(String(e.reason))) { const b = document.getElementById('ex-body'); if (b) b.innerHTML = updateMsg(); } });
 
 
 // ---------------------------------------------------------------- Boussole
@@ -445,7 +452,7 @@ function viewData() {
     <h2>Zone sensible</h2>
     <div class="card"><p class="small" style="margin-top:0">Effacer toutes les données de cet appareil. Pense à exporter avant.</p>
       <button class="btn" id="reset">Tout effacer…</button><div id="reset-confirm"></div></div>
-    <p class="tiny muted" style="margin-top:24px">MESAICOSA v1.4 · Mens sana in corpore sano</p>
+    <p class="tiny muted" style="margin-top:24px">MESAICOSA v1.4.1 · Mens sana in corpore sano</p>
   `);
   const fileName = () => `mesaicosa-${today()}.json`;
   const download = async () => {
@@ -625,5 +632,13 @@ function exportReminder() {
 gate();
 
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  const hadController = !!navigator.serviceWorker.controller;
   navigator.serviceWorker.register('sw.js').catch(() => {});
+  // Une nouvelle version vient d'être installée : on propose de recharger pour ne pas mélanger les versions
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!hadController || document.getElementById('upd')) return;
+    document.body.insertAdjacentHTML('beforeend', `<div id="upd" class="card" role="alert" style="position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--tab-h) + 16px + env(safe-area-inset-bottom));z-index:30;display:flex;gap:10px;align-items:center;max-width:92vw">
+      <span class="small">Nouvelle version de MESAICOSA installée.</span><button class="btn primary small" id="upd-go">Recharger</button></div>`);
+    document.getElementById('upd-go').onclick = async () => { await S.flush(); location.reload(); };
+  });
 }
