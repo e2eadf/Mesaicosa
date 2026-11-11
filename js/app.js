@@ -437,6 +437,10 @@ function viewData() {
       <div class="stat"><div class="k">Jours modifiés</div><div class="v">${Object.values(st.overrides).filter(x => x.v).length}</div></div>
       <div class="stat"><div class="k">Textes ajoutés</div><div class="v">${S.alive('typingTexts').length + S.alive('readingTexts').length}</div></div>
     </div>
+    <h2>Affichage</h2>
+    <div class="card"><div class="small muted" style="margin-bottom:8px">Thème</div>
+      <div class="seg" role="group" aria-label="Thème">${THEMES.map(([k, ic, l]) => `<button data-theme-opt="${k}" aria-pressed="${getTheme() === k}">${ic} ${k === 'auto' ? 'Automatique' : l}</button>`).join('')}</div>
+      <p class="tiny muted" style="margin-bottom:0">Automatique suit le réglage de ton téléphone ou de ton PC. Le bouton en haut à droite permet aussi de changer de thème.</p></div>
     <h2>Accès et sécurité</h2>
     <div class="card"><p class="small" style="margin-top:0">Tes données sont chiffrées sur cet appareil avec ton identifiant et ton mot de passe, ainsi que les fichiers partagés. L'app se verrouille après 15 minutes d'inactivité ou 5 minutes en arrière-plan. Sans le mot de passe, personne (pas même toi) ne peut récupérer les données.</p>
       <details><summary class="small">Changer d'identifiant ou de mot de passe</summary>
@@ -452,7 +456,7 @@ function viewData() {
     <h2>Zone sensible</h2>
     <div class="card"><p class="small" style="margin-top:0">Effacer toutes les données de cet appareil. Pense à exporter avant.</p>
       <button class="btn" id="reset">Tout effacer…</button><div id="reset-confirm"></div></div>
-    <p class="tiny muted" style="margin-top:24px">MESAICOSA v1.4.2 · Mens sana in corpore sano</p>
+    <p class="tiny muted" style="margin-top:24px">MESAICOSA v1.5 · Mens sana in corpore sano</p>
   `);
   const fileName = () => `mesaicosa-${today()}.json`;
   const download = async () => {
@@ -462,6 +466,7 @@ function viewData() {
   };
   const refreshExp = () => { const e = document.getElementById('last-exp'); if (e) e.textContent = fmt(S.get().lastExport); };
   document.getElementById('dl').onclick = download;
+  view.querySelectorAll('[data-theme-opt]').forEach(b => b.onclick = () => applyTheme(b.dataset.themeOpt));
   document.getElementById('lock-now').onclick = lockApp;
   if (document.getElementById('share')) document.getElementById('share').onclick = async () => {
     const file = new File([await S.exportJSON()], fileName(), { type: 'application/json' });
@@ -539,6 +544,27 @@ function route() {
   else viewDay(today());
 }
 window.addEventListener('hashchange', () => { if (S.isUnlocked()) route(); });
+
+// ---------------------------------------------------------------- Thème
+const THEMES = [['auto', '◐', 'Automatique (comme le système)'], ['light', '☀', 'Clair'], ['dark', '☾', 'Sombre']];
+function getTheme() { try { return localStorage.getItem('mesaicosa.theme') || 'auto'; } catch { return 'auto'; } }
+function applyTheme(t) {
+  const root = document.documentElement;
+  if (t === 'auto') delete root.dataset.theme; else root.dataset.theme = t;
+  try { localStorage.setItem('mesaicosa.theme', t); } catch { }
+  const dark = t === 'dark' || (t === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
+  document.querySelector('meta[name=theme-color]')?.setAttribute('content', dark ? '#141412' : '#1f2a44');
+  const th = THEMES.find(x => x[0] === t);
+  const b = document.getElementById('theme-btn');
+  if (b) { b.textContent = th[1]; b.title = `Thème : ${th[2]}`; b.setAttribute('aria-label', `Thème : ${th[2]}. Changer de thème`); }
+  document.querySelectorAll('[data-theme-opt]').forEach(x => x.setAttribute('aria-pressed', x.dataset.themeOpt === t));
+}
+document.getElementById('theme-btn').onclick = () => {
+  const i = THEMES.findIndex(x => x[0] === getTheme());
+  const next = THEMES[(i + 1) % THEMES.length];
+  applyTheme(next[0]); toast(`Thème : ${next[2]}`);
+};
+applyTheme(getTheme());
 
 // ---------------------------------------------------------------- Verrou
 async function lockApp() { await S.flush(); location.reload(); }

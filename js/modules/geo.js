@@ -101,12 +101,13 @@ export function mount(el, api) {
     el.innerHTML = `
       <div class="spread small" style="margin-bottom:6px"><span>Question <b id="qn">1</b> / ${queue.length}</span><span><b id="okn">0</b> juste(s)</span>
         <button class="btn small ghost" id="stop">Arrêter</button></div>
-      <div class="q-banner" id="qb" aria-live="polite"></div>
+      <div class="q-banner" id="qb" aria-live="polite" style="padding-bottom:2px"></div>
+      ${mode === 'ou' ? '<div id="fb" class="small" style="text-align:center;min-height:20px;margin-bottom:6px"></div>' : ''}
       <div class="map-wrap" id="mw"><svg id="map" role="img" aria-label="Carte du monde"></svg>
-        <div class="map-tools"><button class="btn" id="zi" aria-label="Zoomer">+</button><button class="btn" id="zo" aria-label="Dézoomer">−</button><button class="btn" id="zr" aria-label="Recentrer">⤾</button></div></div>
-      ${mode === 'ou' ? `<div class="row" style="justify-content:center;margin-top:10px"><button class="btn primary" id="val" disabled>Valider</button></div>` : ''}
+        <div class="map-tools"><button class="btn" id="zi" aria-label="Zoomer">+</button><button class="btn" id="zo" aria-label="Dézoomer">−</button><button class="btn" id="zr" aria-label="Recentrer">⤾</button></div>
+        ${mode === 'ou' ? `<div class="map-validate"><button class="btn primary" id="val" disabled>Valider</button></div>` : ''}</div>
       <div id="choices" class="choices" style="margin-top:12px"></div>
-      <div id="fb" class="small" style="text-align:center;min-height:22px;margin-top:8px"></div>`;
+      ${mode !== 'ou' ? '<div id="fb" class="small" style="text-align:center;min-height:22px;margin-top:8px"></div>' : ''}`;
     el.querySelector('#stop').onclick = () => (idx > 0 || answered ? end() : intro());
     drawMap(pool);
     el.querySelector('#val')?.addEventListener('click', () => { if (selected) validate(selected); });
@@ -115,11 +116,15 @@ export function mount(el, api) {
 
   function drawMap(pool) {
     // carte plus haute sur téléphone : on cadre la zone en largeur et on montre ce qu'il y a autour
-    const wrapW = el.querySelector('#mw').clientWidth || 700;
+    const mw = el.querySelector('#mw');
+    const wrapW = mw.clientWidth || 700;
     const W = 960;
     const portrait = wrapW < 700;
-    const targetH = portrait ? Math.min(window.innerHeight * 0.62, wrapW * 1.5) : wrapW * 0.54;
-    const H = Math.max(500, Math.round(W * targetH / wrapW));
+    // hauteur disponible : de la carte jusqu'à la barre d'onglets, en gardant une marge
+    const tab = window.innerWidth < 900 ? 64 : 0;
+    const avail = window.innerHeight - mw.getBoundingClientRect().top - tab - (mode === 'ou' ? 16 : 150) - 12;
+    const targetH = portrait ? Math.max(260, Math.min(avail, wrapW * 1.5)) : Math.max(320, Math.min(avail, wrapW * 0.6));
+    const H = Math.round(W * targetH / wrapW);
     const svg = el.querySelector('#map');
     svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
     const inRegion = new Set(pool.map(f => f.id));

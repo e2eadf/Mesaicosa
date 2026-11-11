@@ -10,11 +10,15 @@
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="stylesheet" href="css/app.css">
+<script>
+// Thème choisi (clair, sombre ou automatique), appliqué avant l'affichage pour éviter un flash
+(function () { try { var t = localStorage.getItem('mesaicosa.theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {} })();
+</script>
 </head>
 <body>
 <header class="topbar">
   <div class="brand"><span class="brand-mark">M</span><span>MESAICOSA</span></div>
-  <div id="topbar-extra"></div>
+  <div class="topbar-right"><button class="btn small ghost" id="theme-btn" aria-label="Changer de thème"></button><div id="topbar-extra"></div></div>
 </header>
 <main id="view" tabindex="-1"></main>
 <nav class="tabbar" aria-label="Navigation principale">
