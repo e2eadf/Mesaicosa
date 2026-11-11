@@ -11,12 +11,12 @@ export const MODULES = {
   mental:    { name: 'Calcul mental',  ready: true,  where: 'Téléphone ou ordinateur', icon: '∑' },
   geo:       { name: 'Géographie',     ready: true,  where: 'Téléphone ou ordinateur', icon: '◍' },
   reading:   { name: 'Lecture rapide', ready: true,  where: 'Téléphone ou ordinateur', icon: '≡' },
-  memo:      { name: 'Apprentissage par cœur', ready: false, where: 'Téléphone', icon: '❖' },
-  finance:   { name: 'Finance',        ready: false, where: 'Téléphone', icon: '€' },
+  memo:      { name: 'Révisions (par cœur)', ready: true, where: 'Téléphone ou ordinateur', icon: '❖' },
+  finance:   { name: 'Finance (cartes)', ready: true, where: 'Téléphone ou ordinateur', icon: '€' },
   eloquence: { name: 'Éloquence',      ready: false, where: 'Ordinateur (voix)', icon: '◔' },
   ia:        { name: "Comprendre l'IA", ready: false, where: 'Téléphone', icon: '◇' },
   actus:     { name: 'Actus des pays', ready: false, where: 'Téléphone', icon: '◎' },
-  bible:     { name: 'Bible (connaissance)', ready: false, where: 'Téléphone', icon: '✝' },
+  bible:     { name: 'Versets bibliques', ready: true, where: 'Téléphone ou ordinateur', icon: '✝' },
 };
 
 export const minutes = s => { const [h, m] = s.split(':').map(Number); return h * 60 + m; };

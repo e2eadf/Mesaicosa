@@ -2,7 +2,7 @@ import * as S from './store.js';
 import { CATS, MODULES, minutes, blocksFor, sleepFor, isWeekday, templateDay, variantFor, overrideFor } from './schedule.js';
 import { mountEditor } from './editor.js';
 
-export const APP_VERSION = '1.5.1';
+export const APP_VERSION = '2.0.0';
 const view = document.getElementById('view');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const today = () => S.isoDate(new Date());
