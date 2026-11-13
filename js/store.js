@@ -23,6 +23,8 @@ function blank() {
     srs: {},         // carteId -> {v: {due, ivl, ease, reps, lapses, first}, t} : progression des révisions
     srsCfg: {},      // paquetId -> {v: {on, perDay}, t}
     cards: [],       // cartes personnelles ou reçues par paquet : {id, deck, front, back, deleted, t}
+    poems: [],       // textes à apprendre par cœur : {id, title, author, source, stanzas: [[vers]], deleted, t}
+    memoLvl: {},     // strophe -> {v: niveau de masquage atteint, t}
     lastExport: 0,
     lastImport: 0,
   };
@@ -175,8 +177,8 @@ function mergeList(a = [], b = []) {
   for (const x of b) { const y = m.get(x.id); if (!y || (x.t || 0) > (y.t || 0)) m.set(x.id, x); }
   return [...m.values()];
 }
-const MAPS = ['tt', 'checks', 'weights', 'overrides', 'srs', 'srsCfg'];
-const LISTS = ['objectives', 'sessions', 'reviews', 'domains', 'typingTexts', 'readingTexts', 'cards'];
+const MAPS = ['tt', 'checks', 'weights', 'overrides', 'srs', 'srsCfg', 'memoLvl'];
+const LISTS = ['objectives', 'sessions', 'reviews', 'domains', 'typingTexts', 'readingTexts', 'cards', 'poems'];
 
 function mergeBackup(inc) {
   const before = state.sessions.length;
@@ -212,6 +214,7 @@ function packSummary(d) {
   if (d.typingTexts) out.push(`${d.typingTexts.length} texte(s) de dactylographie`);
   if (d.readingTexts) out.push(`${d.readingTexts.length} texte(s) de lecture rapide`);
   if (d.cards) out.push(`${d.cards.length} carte(s) de révision`);
+  if (d.poems) out.push(`${d.poems.length} texte(s) à apprendre par cœur`);
   return out;
 }
 function applyPack(d) {
@@ -220,7 +223,7 @@ function applyPack(d) {
   for (const date in d.days || {}) state.overrides[date] = { v: d.days[date], t };
   for (const date in d.tt || {}) state.tt[date] = { v: !!d.tt[date], t };
   for (const k in d.weights || {}) state.weights[k] = { v: d.weights[k], t };
-  const lists = { domains: d.domains, objectives: d.objectives, typingTexts: d.typingTexts, readingTexts: d.readingTexts, cards: d.cards };
+  const lists = { domains: d.domains, objectives: d.objectives, typingTexts: d.typingTexts, readingTexts: d.readingTexts, cards: d.cards, poems: d.poems };
   for (const k in lists) if (lists[k]) state[k] = mergeList(state[k], lists[k].map(x => ({ ...x, t })));
   state.lastImport = t;
   save();

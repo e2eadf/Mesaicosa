@@ -1,4 +1,8 @@
-import { geoNaturalEarth1, geoPath, geoArea, zoom, zoomIdentity, select, feature } from '../../vendor/geo.js';
+import { geoNaturalEarth1, geoPath, geoArea, zoom, zoomIdentity, zoomTransform, interpolateZoom, select, feature } from '../../vendor/geo.js';
+
+const nf = new Intl.NumberFormat('fr-FR');
+const curName = code => { try { const n = new Intl.DisplayNames(['fr'], { type: 'currency' }).of(code); return n.charAt(0).toUpperCase() + n.slice(1); } catch { return code; } };
+function speak(text) { try { const u = new SpeechSynthesisUtterance(text); u.lang = 'fr-FR'; u.rate = 0.95; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch { } }
 
 const ALL = 'Tous les continents';
 const REGIONS = [ALL, 'Europe', 'Afrique', 'Asie', 'Amérique du Nord et centrale', 'Amérique du Sud', 'Océanie'];
@@ -8,13 +12,14 @@ let cache = null;
 
 async function loadData() {
   if (cache) return cache;
-  const [topo, info] = await Promise.all([
+  const [topo, info, flags] = await Promise.all([
     fetch('data/world.json').then(r => r.json()),
     fetch('data/countries.json').then(r => r.json()),
+    fetch('data/flags.json').then(r => r.json()).catch(() => ({})),
   ]);
   const feats = feature(topo, topo.objects.countries).features;
   feats.forEach(f => { f.info = info[f.id] || { n: f.properties.name, r: '?' }; });
-  cache = { feats, info };
+  cache = { feats, info, flags };
   return cache;
 }
 
@@ -37,7 +42,9 @@ export function mount(el, api) {
   let mode = saved.mode || 'ou';
   let region = REGIONS.includes(saved.region) ? saved.region : (saved.region === 'Monde' ? ALL : 'Europe');
   let count = saved.count ?? 10;
-  let data, queue, idx, ok, answered, selected, lastClick, svgSel, gSel, zoomer, path, timeouts = [];
+  let terr = saved.terr ?? true;   // territoires dépendants et États non membres de l'ONU
+  const inPool = i => i.u || (terr && i.t);
+  let data, queue, idx, ok, answered, selected, lastClick, svgSel, gSel, zoomer, path, waiting = false, VW = 960, VH = 520, anim = 0, timeouts = [];
   const later = (fn, ms) => timeouts.push(setTimeout(fn, ms));
 
   function weightedPick(pool, n) {
@@ -64,6 +71,8 @@ export function mount(el, api) {
             <select id="reg">${REGIONS.map(r => `<option ${r === region ? 'selected' : ''}>${r}</option>`).join('')}</select></div>
           <div><div class="small muted" style="margin-bottom:6px">Nombre de questions</div>${seg('count', COUNTS, count)}
             <div class="tiny muted" id="cnt-info" style="margin-top:4px"></div></div>
+          <label class="row small" style="gap:8px;flex-wrap:nowrap;align-items:flex-start"><input type="checkbox" id="terr" ${terr ? 'checked' : ''} style="margin-top:3px">
+            <span>Inclure les territoires dépendants (Groenland, Nouvelle-Calédonie, Porto Rico, Hong Kong…) et les États non membres de l'ONU (Vatican, Palestine, Kosovo, Taïwan)</span></label>
           <div><button class="btn primary" id="go">Commencer</button></div>
         </div>
         <p class="tiny muted" style="margin-bottom:0">Touche un pays pour le sélectionner, puis « Valider » (ou touche-le deux fois de suite). Les pays que tu rates reviennent plus souvent. Pince ou molette pour zoomer, glisse pour te déplacer.</p>
@@ -74,11 +83,12 @@ export function mount(el, api) {
     const info = () => {
       if (!data) return;
       const n = poolFor().length;
-      el.querySelector('#cnt-info').textContent = `${n} pays dans cette zone${count && count < n ? ` · ${count} questions tirées au sort` : ''}`;
+      el.querySelector('#cnt-info').textContent = `${n} pays${terr ? ' et territoires' : ''} dans cette zone${count && count < n ? ` · ${count} questions tirées au sort` : ''}`;
     };
     el.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => { mode = b.dataset.mode; el.querySelectorAll('[data-mode]').forEach(x => x.setAttribute('aria-pressed', x === b)); info(); });
     el.querySelectorAll('[data-count]').forEach(b => b.onclick = () => { count = Number(b.dataset.count); el.querySelectorAll('[data-count]').forEach(x => x.setAttribute('aria-pressed', x === b)); info(); });
     el.querySelector('#reg').onchange = e => { region = e.target.value; info(); };
+    el.querySelector('#terr').onchange = e => { terr = e.target.checked; info(); };
     el.querySelector('#go').onclick = start;
     loadData().then(d => {
       data = d; info();
@@ -90,7 +100,7 @@ export function mount(el, api) {
   }
 
   function poolFor() {
-    return data.feats.filter(f => f.info.u && (region === ALL || f.info.r === region) && (mode !== 'cap' || f.info.c));
+    return data.feats.filter(f => inPool(f.info) && (region === ALL || f.info.r === region) && (mode !== 'cap' || (f.info.c && f.info.c !== '—')));
   }
 
   async function start() {
@@ -127,6 +137,7 @@ export function mount(el, api) {
     const H = Math.round(W * targetH / wrapW);
     const svg = el.querySelector('#map');
     svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    VW = W; VH = H;
     const inRegion = new Set(pool.map(f => f.id));
     const fitFeats = region === ALL ? { type: 'Sphere' }
       : { type: 'FeatureCollection', features: data.feats.filter(f => f.info.r === region && f.id !== '643').map(mainPart) };
@@ -149,6 +160,7 @@ export function mount(el, api) {
     zoomer = zoom().scaleExtent([1, 30]).translateExtent([[-300, -300], [W + 300, H + 300]])
       .on('zoom', ev => { gSel.attr('transform', ev.transform); gSel.selectAll('circle').attr('r', 6 / ev.transform.k); });
     svgSel.call(zoomer).on('dblclick.zoom', null);
+    svgSel.on('click.next', () => { if (waiting) next(); });
     el.querySelector('#zi').onclick = () => svgSel.call(zoomer.scaleBy, 1.6);
     el.querySelector('#zo').onclick = () => svgSel.call(zoomer.scaleBy, 1 / 1.6);
     el.querySelector('#zr').onclick = () => svgSel.call(zoomer.transform, zoomIdentity);
@@ -171,7 +183,7 @@ export function mount(el, api) {
     } else {
       el.querySelector('#qb').textContent = 'Quel est ce pays ?';
       setClass(f.id, 'target');
-      const pool = data.feats.filter(x => x.info.u && x.id !== f.id && (x.info.r === f.info.r));
+      const pool = data.feats.filter(x => inPool(x.info) && x.id !== f.id && (x.info.r === f.info.r));
       const opts = shuffle([f, ...shuffle(pool.slice()).slice(0, 3)]);
       choices.innerHTML = opts.map(o => `<button class="btn choice" data-id="${o.id}">${esc(o.info.n)}</button>`).join('');
       choices.querySelectorAll('button').forEach(b => b.onclick = () => answer(b.dataset.id === f.id, b));
@@ -184,7 +196,7 @@ export function mount(el, api) {
 
   // 1er clic : sélection ; 2e clic sur le même pays (moins de 0,6 s) ou bouton « Valider » : réponse
   function onMapClick(d) {
-    if (mode !== 'ou' || answered) return;
+    if (waiting || mode !== 'ou' || answered) return;
     const t = Date.now();
     if (selected && selected.id === d.id && lastClick && t - lastClick < 600) { validate(d); return; }
     if (selected) setClass(selected.id, 'sel', false);
@@ -217,7 +229,67 @@ export function mount(el, api) {
       if (!good && btn) btn.classList.add('ko');
       fb.innerHTML = good ? `<span class="feedback-ok">Exact.</span>` : `<span class="feedback-ko">C'était ${esc(f.info.n)}.</span>`;
     }
-    later(() => { gSel.selectAll('circle.tmp').remove(); idx++; idx < queue.length ? ask() : end(); }, good ? 900 : 2200);
+    showFiche(f, good);
+  }
+
+  // --- après chaque réponse : zoom sur le bon pays et fiche d'identité ; le clic suivant passe à la question suivante
+  function animateTo(view, ms = 650) {
+    cancelAnimationFrame(anim);
+    const t = zoomTransform(svgSel.node());
+    const from = [(VW / 2 - t.x) / t.k, (VH / 2 - t.y) / t.k, VW / t.k];
+    const interp = interpolateZoom(from, view);
+    const dur = Math.max(250, Math.min(ms, interp.duration * 0.5));
+    const t0 = performance.now();
+    const step = now => {
+      const p = Math.min(1, (now - t0) / dur), e = p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+      const [x, y, w] = interp(e), k = VW / w;
+      svgSel.call(zoomer.transform, zoomIdentity.translate(VW / 2 - x * k, VH / 2 - y * k).scale(k));
+      if (p < 1) anim = requestAnimationFrame(step);
+    };
+    anim = requestAnimationFrame(step);
+  }
+
+  function showFiche(f, good) {
+    // activé juste après : le clic qui vient de répondre ne doit pas déjà passer à la suite
+    setTimeout(() => { waiting = true; }, 60);
+    const [[x0, y0], [x1, y1]] = path.bounds(mainPart(f));
+    const w = Math.min(VW * 1.2, Math.max(VW / 16, (x1 - x0) * 2.6, (y1 - y0) * 2.6 * VW / VH));
+    // le pays apparaît dans la moitié haute, la fiche occupe le bas
+    animateTo([(x0 + x1) / 2, (y0 + y1) / 2 + (w * VH / VW) * 0.2, w]);
+    const i = f.info;
+    const val = el.querySelector('.map-validate'); if (val) val.style.display = 'none';
+    el.querySelector('#mw').insertAdjacentHTML('beforeend', `<div class="fiche ${good ? 'good' : 'bad'}" id="fiche" role="dialog" aria-label="Fiche ${esc(i.n)}">
+      <div class="fiche-top">${i.i2 && data.flags[i.i2] ? `<img src="data:image/svg+xml;charset=utf-8,${encodeURIComponent(data.flags[i.i2])}" alt="Drapeau : ${esc(i.n)}" class="flag">` : ''}
+        <button class="btn small" id="say" aria-label="Écouter la prononciation">🔊</button></div>
+      <div class="fiche-name">${esc(i.n)}</div>
+      <dl>
+        ${i.st ? `<dt>Statut</dt><dd>${esc(i.st)}</dd>` : ''}
+        ${i.c && i.c !== '—' ? `<dt>Capitale</dt><dd>${esc(i.c)}</dd>` : ''}
+        ${i.p ? `<dt>Population</dt><dd>${nf.format(i.p)}${i.py ? ` <span class="tiny muted">(${i.py})</span>` : ''}</dd>` : ''}
+        ${i.a ? `<dt>Superficie</dt><dd>${nf.format(i.a)} km²</dd>` : ''}
+        ${i.cur?.length ? `<dt>Monnaie</dt><dd>${i.cur.map(c => `${esc(curName(c))} (${esc(c)})`).join(', ')}</dd>` : ''}
+        <dt>Continent</dt><dd>${esc(i.r)}</dd>
+      </dl>
+      <div class="tiny muted fiche-next">Touche la carte ou la fiche pour continuer</div></div>`);
+    const fiche = el.querySelector('#fiche');
+    fiche.addEventListener('click', e => { e.stopPropagation(); next(); });
+    el.querySelector('#say').addEventListener('click', e => { e.stopPropagation(); speak(`${i.n}. Capitale : ${i.c || 'aucune'}.`); });
+    if (mode === 'nom') {
+      el.querySelector('#choices').insertAdjacentHTML('beforeend', '<button class="btn primary" id="nxt">Suivant</button>');
+      el.querySelector('#nxt').onclick = next;
+    }
+  }
+
+  function next() {
+    if (!waiting) return;
+    waiting = false;
+    el.querySelector('#fiche')?.remove();
+    const val = el.querySelector('.map-validate'); if (val) val.style.display = '';
+    gSel.selectAll('circle.tmp').remove();
+    idx++;
+    if (idx >= queue.length) { end(); return; }
+    animateTo([VW / 2, VH / 2, VW], 450);
+    ask();
   }
 
   function quizCap(pool) {
@@ -251,10 +323,11 @@ export function mount(el, api) {
 
   function end() {
     timeouts.forEach(clearTimeout); timeouts = [];
+    waiting = false;
     const n = Math.min(queue.length, idx + (answered && idx < queue.length ? 1 : 0));
     if (!n) { intro(); return; }
     const pct = Math.round(100 * ok / n);
-    api.save(pct, '%', { mode, region, ok, n, count, total: queue.length });
+    api.save(pct, '%', { mode, region, ok, n, count, terr, total: queue.length });
     el.innerHTML = `<div class="card" style="text-align:center;border-color:var(--ok)">
       <h3>${ok} / ${n} · ${pct} %</h3>
       <p class="small muted">${n < queue.length ? `Séance arrêtée après ${n} questions sur ${queue.length}. ` : ''}${pct === 100 ? 'Sans faute. Passe à une autre zone ou un autre exercice.' : 'Les pays manqués reviendront plus souvent.'}</p>
@@ -264,5 +337,5 @@ export function mount(el, api) {
   }
 
   intro();
-  return () => timeouts.forEach(clearTimeout);
+  return () => { timeouts.forEach(clearTimeout); cancelAnimationFrame(anim); try { speechSynthesis.cancel(); } catch { } };
 }
