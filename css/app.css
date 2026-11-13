@@ -221,3 +221,10 @@ body.locked{padding-left:0!important}
 .mask{color:var(--accent);cursor:pointer;letter-spacing:1px;border-radius:4px}
 .mask .mask-rest{opacity:.55}
 .mask.peek{background:var(--accent-bg);letter-spacing:0}
+
+/* codes Alt */
+.alt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:6px;margin-top:10px}
+.alt-cell{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:4px 8px;border:1px solid var(--line);border-radius:6px;font-size:13px}
+.alt-cell b{font-size:16px}.alt-cell span{font-variant-numeric:tabular-nums;color:var(--muted)}
+.alt-cell.next{background:var(--accent);border-color:var(--accent);color:#fff}.alt-cell.next span{color:#fff}
+@media (max-width:560px){#alt-panel{display:none}}

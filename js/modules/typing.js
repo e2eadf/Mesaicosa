@@ -1,6 +1,15 @@
 import { TYPING_TEXTS } from '../content.js';
 
-const norm = s => s.replace(/[«»“”]/g, '"').replace(/[’‘]/g, "'").replace(/œ/g, 'oe').replace(/Œ/g, 'Oe').replace(/[  ]/g, ' ').replace(/…/g, '...');
+const norm = s => s.replace(/[“”]/g, '"').replace(/[’‘]/g, "'").replace(/[\u00a0\u202f]/g, ' ').replace(/…/g, '...');
+
+// Codes Alt (Windows, pavé numérique) pour les caractères absents du clavier AZERTY
+const ALT = [['à', '133'], ['À', '0192'], ['â', '131'], ['Â', '0194'], ['é', '130'], ['É', '0201'], ['è', '138'], ['È', '0200'],
+  ['ê', '136'], ['Ê', '0202'], ['ë', '137'], ['Ë', '0203'], ['î', '140'], ['Î', '0206'], ['ï', '139'], ['Ï', '0207'],
+  ['ô', '147'], ['Ô', '0212'], ['œ', '0156'], ['Œ', '0140'], ['û', '150'], ['Û', '0219'], ['ù', '151'], ['Ù', '0217'],
+  ['ü', '129'], ['Ü', '0220'], ['ç', '135'], ['Ç', '128'], ['«', '174'], ['»', '175'], ['€', '0128']];
+const ALTMAP = Object.fromEntries(ALT);
+// caractères qui n'existent pas directement sur le clavier : on montre le code Alt
+const NEEDS_ALT = new Set(['À', 'Â', 'É', 'È', 'Ê', 'Ë', 'Î', 'Ï', 'Ô', 'Œ', 'Û', 'Ù', 'Ü', 'Ç', 'œ', '«', '»']);
 const tid = t => t.slice(0, 48);
 
 // Clavier AZERTY (France) : [caractère, caractère avec Maj, doigt]
@@ -63,7 +72,10 @@ export function mount(el, api) {
     const row = (r, i) => `<div class="krow">${i === 3 ? '<div class="k wide" data-shift="l">Maj</div>' : ''}${r.map(k =>
       `<div class="k f-${k[2]} ${HOME.has(k[0]) ? 'home' : ''}" data-k="${esc(k[0])}">${k[1] && k[1] !== k[0].toUpperCase() ? `<span class="sh">${esc(k[1])}</span>` : ''}${esc(/^[a-z]$/.test(k[0]) ? k[0].toUpperCase() : k[0])}</div>`).join('')}${i === 3 ? '<div class="k wide" data-shift="r">Maj</div>' : ''}</div>`;
     return `<div class="kb" id="kb" aria-hidden="true">${ROWS.map(row).join('')}<div class="krow"><div class="k space f-th" data-space="1">espace</div></div></div>
-      <div class="kb-hint muted" id="kb-hint"></div>`;
+      <div class="kb-hint muted" id="kb-hint"></div>
+      <details class="card" id="alt-panel" open style="margin-top:10px"><summary class="small">Caractères spéciaux : Alt + code (pavé numérique)</summary>
+        <div class="alt-grid">${ALT.map(([c, code]) => `<div class="alt-cell" data-ch="${esc(c)}"><b>${esc(c)}</b><span>${code}</span></div>`).join('')}</div>
+        <p class="tiny muted" style="margin-bottom:0">Maintiens Alt, tape le code sur le pavé numérique (Verr Num activé), puis relâche Alt.</p></details>`;
   }
 
   function setup() {
@@ -79,7 +91,7 @@ export function mount(el, api) {
       <div class="typing-text" id="tt" tabindex="0" aria-label="Texte à recopier. Touche ici puis tape."></div>
       <textarea class="hidden-input" id="in" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Zone de frappe"></textarea>
       ${uiPref ? kbHtml() : ''}
-      <p class="small muted">Garde les yeux sur l'écran, jamais sur ton clavier : le clavier affiché te montre la touche et le doigt à utiliser. Index posés sur F et J (les touches à repère). Au début, la précision sera basse : c'est normal, elle montera avec la régularité. Les guillemets et « œ » s'écrivent " et oe.</p>
+      <p class="small muted">Garde les yeux sur l'écran, jamais sur ton clavier : le clavier affiché te montre la touche et le doigt à utiliser. Index posés sur F et J (les touches à repère). Au début, la précision sera basse : c'est normal, elle montera avec la régularité. Après une erreur, tu peux continuer ou corriger avec Retour arrière. Les caractères absents du clavier (É, À, œ, « »…) se tapent avec Alt + code : voir le tableau.</p>
       <div class="row"><button class="btn" id="new">Autre texte</button>
         <label class="row small" style="gap:6px"><input type="checkbox" id="kbt" ${uiPref ? 'checked' : ''}> Clavier à l'écran</label></div>
       ${hist.length ? `<h2>Dernières séances</h2><table class="hist"><tr><th>Date</th><th>Mots/min</th><th>Précision</th></tr>
@@ -100,11 +112,18 @@ export function mount(el, api) {
     const hint = el.querySelector('#kb-hint');
     if (typed.length >= text.length) { hint.textContent = ''; return; }
     // si la frappe précédente est fausse, on montre la touche Retour arrière
-    const wrongAt = [...typed].findIndex((c, i) => c !== text[i]);
-    if (wrongAt >= 0) { hint.innerHTML = '<span class="feedback-ko">Erreur : efface avec Retour arrière (auriculaire droit)</span>'; return; }
+    // une erreur ne bloque pas : on montre toujours la touche suivante ; corriger reste possible avec Retour arrière
+    const lastWrong = typed.length && typed[typed.length - 1] !== text[typed.length - 1];
+    const errNote = lastWrong ? '<span class="feedback-ko">Erreur · continue, ou corrige avec Retour arrière.</span> ' : '';
+    el.querySelectorAll('#alt-panel .alt-cell').forEach(c => c.classList.remove('next'));
     const ch = text[typed.length];
+    if (NEEDS_ALT.has(ch) && ALTMAP[ch]) {
+      hint.innerHTML = `${errNote}<b>${esc(ch)}</b> : Alt + ${ALTMAP[ch]} (pavé numérique, Verr Num activé)`;
+      el.querySelector(`#alt-panel [data-ch="${CSS.escape(ch)}"]`)?.classList.add('next');
+      return;
+    }
     const seq = keysFor(ch);
-    if (!seq.length) { hint.textContent = `Caractère spécial : ${ch}`; return; }
+    if (!seq.length) { hint.innerHTML = `${errNote}Caractère spécial : ${esc(ch)}`; return; }
     const parts = [];
     seq.forEach((s, i) => {
       const cls = i === 0 ? 'next' : 'then';
@@ -113,7 +132,7 @@ export function mount(el, api) {
       if (s.shift) kb.querySelector(`[data-shift="${s.k[2][0] === 'l' ? 'r' : 'l'}"]`)?.classList.add(cls);
       parts.push(`${s.shift ? 'Maj + ' : ''}${s.k[0].toUpperCase()} (${FINGER[s.k[2]]})`);
     });
-    hint.textContent = parts.join(' puis ');
+    hint.innerHTML = errNote + esc(parts.join(' puis '));
   }
 
   function draw() {
