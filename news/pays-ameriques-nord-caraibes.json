@@ -1,0 +1,676 @@
+{
+ "updated": "2026-11-15T00:25:00+01:00",
+ "countries": {
+  "AG": {
+   "checked": "2026-11-15",
+   "items": [
+    {
+     "date": "2026-11-11",
+     "cat": "politique",
+     "title": "Antigua dit avoir renoncé à voter sur Cuba à l'ONU après un avertissement américain",
+     "summary": "Le Premier ministre Gaston Browne affirme qu'un appel du Département d'État lié aux négociations sur les visas a conduit son pays à ne pas soutenir la résolution onusienne sur l'embargo contre Cuba. Il a aussi annoncé la suspension progressive du programme de citoyenneté par investissement à partir du 12 novembre.",
+     "links": [
+      {
+       "src": "Jamaica Observer",
+       "url": "https://www.jamaicaobserver.com/2026/11/11/browne-says-antigua-changed-un-vote-cuba-us-warning/"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-04",
+     "cat": "politique",
+     "title": "Le sommet du Commonwealth à Antigua s'achève sur des engagements climat et commerce",
+     "summary": "Réunis à St John's, les dirigeants du Commonwealth ont adopté un communiqué réaffirmant l'objectif de 1,5 °C et appelant à réformer la dette des pays vulnérables au climat. Environ 500 millions de dollars d'engagements ont été annoncés pour les renouvelables, les compétences des jeunes et le commerce.",
+     "links": [
+      {
+       "src": "PINA",
+       "url": "https://pina.com.fj/2026/11/05/commonwealth-leaders-commit-to-climate-finance-trade-and-pacific-resilience/"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-01",
+     "cat": "societe",
+     "title": "Charles III assiste aux 45 ans de l'indépendance d'Antigua-et-Barbuda",
+     "summary": "Le roi Charles III et la reine Camilla ont participé au défilé de la fête de l'indépendance et à un match de cricket d'exhibition, en marge du sommet du Commonwealth organisé dans l'archipel.",
+     "links": [
+      {
+       "src": "AP / KSAT",
+       "url": "https://www.ksat.com/gallery/news/2026/11/02/dozens-of-commonwealth-leaders-descend-on-antigua-during-global-political-turbulence/"
+      }
+     ]
+    }
+   ]
+  },
+  "BS": {
+   "checked": "2026-11-15",
+   "items": [
+    {
+     "date": "2026-11-11",
+     "cat": "sciences",
+     "title": "COP31 : les Bahamas misent 75 millions de dollars de plus sur le carbone bleu",
+     "summary": "À la COP31, le gouvernement bahaméen a lancé son programme national de carbone bleu, fondé sur la protection des herbiers et mangroves. Il appelle les investisseurs à le financer et les acheteurs à négocier de futurs crédits carbone.",
+     "links": [
+      {
+       "src": "Quantum Commodity Intelligence",
+       "url": "https://www.qcintel.com/carbon/article/cop31-bahamas-commits-75m-more-to-blue-carbon-77264.html"
+      },
+      {
+       "src": "Cabinet du Premier ministre",
+       "url": "https://opm.gov.bs/press-office/page/2"
+      }
+     ]
+    }
+   ]
+  },
+  "BB": {
+   "checked": "2026-11-15",
+   "items": [
+    {
+     "date": "2026-11-02",
+     "cat": "politique",
+     "title": "Mia Mottley et le Premier ministre britannique évoquent climat, dette et esclavage",
+     "summary": "Avant le sommet du Commonwealth, la Première ministre barbadienne a rencontré son homologue britannique. Les deux dirigeants ont parlé de réforme des règles de la dette via le G20 et des suites d'un dialogue structuré sur l'héritage de la traite transatlantique.",
+     "links": [
+      {
+       "src": "GOV.UK",
+       "url": "https://www.gov.uk/government/news/pm-meeting-with-prime-minister-mottley-of-barbados-2-november-2026"
+      }
+     ]
+    }
+   ]
+  },
+  "BZ": {
+   "checked": "2026-11-15",
+   "items": [
+    {
+     "date": "2026-11-12",
+     "cat": "economie",
+     "title": "Le Belize lance #planBelize 2.0, sa stratégie de développement 2026-2030",
+     "summary": "Le gouvernement a présenté sa stratégie de développement à moyen terme pour 2026-2030. Il dit aussi vouloir appliquer les recommandations d'une récente mission de l'OMC pour réduire les coûts commerciaux et élargir les exportations.",
+     "links": [
+      {
+       "src": "Government of Belize Press Office",
+       "url": "https://www.pressoffice.gov.bz/?p=17067"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-07",
+     "cat": "politique",
+     "title": "Incident sur le fleuve Sarstoon : le Belize accuse le Guatemala d'intimidation",
+     "summary": "Selon Belmopan, deux navires militaires guatémaltèques ont approché de façon agressive une patrouille de la Force de défense bélizienne près de l'île Sarstoon. Le Belize a renforcé sa base avancée, prévoit une note de protestation et a saisi l'OEA ; le différend territorial est pendant devant la CIJ.",
+     "links": [
+      {
+       "src": "The Rio Times",
+       "url": "https://www.riotimesonline.com/belize-guatemala-sarstoon-river-patrol-protest-2026/"
+      },
+      {
+       "src": "Government of Belize Press Office",
+       "url": "https://www.pressoffice.gov.bz/?p=17067"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-02",
+     "cat": "sciences",
+     "title": "Biodiversité : le Belize réclame plus de soutien international à la COP17",
+     "summary": "À Erevan, le ministre Orlando Habet a rappelé qu'environ 40 % des terres du pays sont protégées et chiffré à 137 millions de dollars le coût de la stratégie nationale 2025-2035. Il a exhorté les pays développés à tenir leurs engagements de financement.",
+     "links": [
+      {
+       "src": "Jamaica Observer",
+       "url": "https://www.jamaicaobserver.com/2026/11/02/belize-reaffirms-calls-stronger-international-support-biodiversity/"
+      }
+     ]
+    }
+   ]
+  },
+  "CA": {
+   "checked": "2026-11-15",
+   "items": [
+    {
+     "date": "2026-11-06",
+     "cat": "economie",
+     "title": "Le chômage au Canada monte à 6,7 % en octobre",
+     "summary": "Selon Statistique Canada, le taux de chômage a atteint son plus haut niveau en six mois, l'économie ayant perdu près de 5 000 emplois en octobre, sur fond de guerre commerciale avec les États-Unis.",
+     "links": [
+      {
+       "src": "Global News",
+       "url": "https://globalnews.ca/video/12139960/business-matters-unemployment-rises-to-6-7-in-october/"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-05",
+     "cat": "economie",
+     "title": "Budget 2026 : Ottawa ajoute 142 milliards de mesures au nom de la souveraineté économique",
+     "summary": "Le gouvernement Carney prévoit un déficit de 62,3 milliards de dollars cette année, sans retour à l'équilibre à l'horizon. Le budget mise sur une super-déduction pour l'investissement des entreprises, la lutte contre l'itinérance et la réduction de la dépendance aux États-Unis.",
+     "links": [
+      {
+       "src": "BNN Bloomberg",
+       "url": "https://www.bnnbloomberg.ca/business/politics/2026/11/05/carney-government-adds-142b-in-new-spending-to-spur-economic-growth-address-affordability/"
+      },
+      {
+       "src": "SCMP",
+       "url": "https://www.scmp.com/news/world/united-states-canada/article/3373484/canada-budget-charts-economic-independence-decisive-shift-us"
+      }
+     ]
+    }
+   ]
+  },
+  "CR": {
+   "checked": "2026-11-15",
+   "items": [
+    {
+     "date": "2026-11-13",
+     "cat": "economie",
+     "title": "Le dollar tombe à un plus bas historique de 446 colóns au Costa Rica",
+     "summary": "La devise américaine a atteint son niveau le plus faible depuis l'ouverture du marché Monex en 2006, après huit jours de baisse consécutifs. Les vols vers les États-Unis ont par ailleurs été perturbés par l'arrêt général du trafic décidé par la FAA.",
+     "links": [
+      {
+       "src": "The Tico Times",
+       "url": "https://www.ticotimes.net/"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-12",
+     "cat": "sciences",
+     "title": "El Niño pourrait priver d'eau potable plus de 300 000 Costariciens",
+     "summary": "Les autorités craignent qu'un épisode El Niño d'intensité record perturbe l'approvisionnement de quelque 306 000 personnes. Parallèlement, les cas de dengue ont bondi de 58 % et le chikungunya dépasse les 1 000 cas, surtout au Guanacaste.",
+     "links": [
+      {
+       "src": "The Tico Times",
+       "url": "https://www.ticotimes.net/"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-11",
+     "cat": "societe",
+     "title": "Grève d'un jour des enseignants et des universités à San José",
+     "summary": "Onze organisations syndicales et universitaires ont défilé dans le centre de la capitale. Le gouvernement a annoncé son intention de retenir une journée de salaire aux personnels de l'éducation grévistes.",
+     "links": [
+      {
+       "src": "The Tico Times",
+       "url": "https://www.ticotimes.net/"
+      }
+     ]
+    }
+   ]
+  },
+  "CU": {
+   "checked": "2026-11-15",
+   "items": [
+    {
+     "date": "2026-11-10",
+     "cat": "politique",
+     "title": "La Havane répond à Washington : l'avenir de Cuba « ne se décidera jamais » depuis le Nord",
+     "summary": "Après de nouvelles déclarations de Donald Trump et de Marco Rubio qualifiant Cuba d'État failli, Miguel Díaz-Canel a dénoncé un « châtiment collectif » contre la population. Les tensions se sont accrues depuis janvier avec un blocus pétrolier américain qui aggrave la crise énergétique.",
+     "links": [
+      {
+       "src": "La Prensa (EFE)",
+       "url": "https://www.laprensa.hn/mundo/cuba-afirmal-futuro-isla-no-se-decidira-jamas-eeuu-GN32596541"
+      }
+     ]
+    }
+   ]
+  },
+  "DM": {
+   "checked": "2026-11-15",
+   "items": [
+    {
+     "date": "2026-11-11",
+     "cat": "politique",
+     "title": "La Dominique défend sa citoyenneté par investissement face à l'UE",
+     "summary": "Le gouvernement Skerrit affirme que ce programme finance infrastructures et reconstruction et cherche un accord pragmatique avec Bruxelles, qui demande son abandon d'ici juin 2028 sous peine de menacer l'exemption de visa.",
+     "links": [
+      {
+       "src": "The Rio Times",
+       "url": "https://www.riotimesonline.com/dominica-skerrit-defends-citizenship-by-investment-eu-2026/"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-03",
+     "cat": "societe",
+     "title": "La Dominique célèbre 48 ans d'indépendance",
+     "summary": "Le Premier ministre Roosevelt Skerrit a promis un pays « plus fort et plus sûr » sous le thème « Notre parcours, notre héritage, notre avenir ». Washington a salué un partenaire proche en matière de sécurité et d'énergie.",
+     "links": [
+      {
+       "src": "Caribbean National Weekly",
+       "url": "https://www.caribbeannationalweekly.com/posts/skerrit-reaffirms-commitment-to-stronger-dominica-on-48th-independence"
+      }
+     ]
+    }
+   ]
+  },
+  "US": {
+   "checked": "2026-11-15",
+   "items": [
+    {
+     "date": "2026-11-13",
+     "cat": "incidents",
+     "title": "Une panne télécom de la FAA cloue au sol tous les vols aux États-Unis",
+     "summary": "Une défaillance du système de télécommunications du contrôle aérien a entraîné un arrêt national des décollages pendant plus de quatre heures, le troisième du siècle. Des milliers de vols ont été annulés jusqu'au week-end ; le gouvernement écarte une cyberattaque.",
+     "links": [
+      {
+       "src": "Acento (EFE)",
+       "url": "https://acento.com.do/internacional/eeuu-preve-5-000-vuelos-cancelados-este-sabado-antes-de-volver-a-la-normalidad-el-domingo-9790065.html"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-04",
+     "cat": "politique",
+     "title": "Midterms : les démocrates prennent le contrôle de la Chambre et du Sénat",
+     "summary": "Les démocrates ont remporté les deux chambres du Congrès lors des élections de mi-mandat, une première défaite de ce type pour un président républicain depuis vingt ans. Plusieurs sièges ont basculé, notamment au Texas, au Kansas et en Caroline du Sud.",
+     "links": [
+      {
+       "src": "Al Jazeera",
+       "url": "https://www.aljazeera.com/news/2026/11/4/democrats-win-control-of-house-and-senate-key-us-midterms-takeaways"
+      },
+      {
+       "src": "NPR / KUT",
+       "url": "https://www.kut.org/politics/2026-11-04/democrats-win-full-control-of-congress-ushering-in-a-new-era-of-divided-government"
+      }
+     ]
+    }
+   ]
+  },
+  "GD": {
+   "checked": "2026-11-15",
+   "items": [
+    {
+     "date": "2026-11-06",
+     "cat": "politique",
+     "title": "Grenade : le NDC de Dickon Mitchell réélu avec 14 sièges sur 15",
+     "summary": "Lors des législatives du 5 novembre, le Congrès national démocratique a obtenu environ 61 % des voix selon les résultats provisoires, laissant un seul siège au NNP d'opposition. La participation s'est établie à 63 %.",
+     "links": [
+      {
+       "src": "Jamaica Observer",
+       "url": "https://www.jamaicaobserver.com/2026/11/06/mitchells-national-democratic-congress-sweeps-grenada-polls/"
+      }
+     ]
+    }
+   ]
+  },
+  "GT": {
+   "checked": "2026-11-15",
+   "items": [
+    {
+     "date": "2026-11-09",
+     "cat": "incidents",
+     "title": "Un député assassiné à Zacapa avec trois policiers",
+     "summary": "Le député Julio Portillo a été tué le 6 novembre au soir lors d'une attaque qui a aussi coûté la vie à trois agents de la police nationale. Le président Arévalo a condamné les faits et demandé aux forces de sécurité d'appuyer l'enquête du parquet.",
+     "links": [
+      {
+       "src": "Emisoras Unidas",
+       "url": "https://emisorasunidas.com/nacional/2026/11/09/presidente-arevalo-retoma-agenda-guatemala-viaje-cumbre-espana/"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-05",
+     "cat": "politique",
+     "title": "Arévalo plaide à Madrid pour un multilatéralisme aux « réponses concrètes »",
+     "summary": "Au XXXe Sommet ibéro-américain, le président guatémaltèque a estimé que la démocratie ne se limite pas aux urnes. Il a aussi assuré que l'agenda commun avec les États-Unis ne changerait pas après les élections américaines.",
+     "links": [
+      {
+       "src": "Emisoras Unidas",
+       "url": "https://emisorasunidas.com/nacional/2026/11/09/presidente-arevalo-retoma-agenda-guatemala-viaje-cumbre-espana/"
+      },
+      {
+       "src": "Emisoras Unidas",
+       "url": "https://emisorasunidas.com/nacional/2026/11/04/arevalo-agenda-temas-estados-unidos-cambios-elecciones/"
+      }
+     ]
+    }
+   ]
+  },
+  "HT": {
+   "checked": "2026-11-15",
+   "items": [
+    {
+     "date": "2026-11-06",
+     "cat": "politique",
+     "title": "Le gang 400 Mawozo dit vouloir dialoguer avec la commission de désarmement",
+     "summary": "Accusé de meurtres et d'enlèvements, le gang affirme avoir contacté la commission chargée du désarmement et réclame une pause des opérations militaires. Le Premier ministre a annoncé la mort d'un chef de gang à Cité Soleil.",
+     "links": [
+      {
+       "src": "Noovo Info (AP)",
+       "url": "https://www.noovo.info/nouvelles/international/article/un-gang-haitien-tend-la-main-au-groupe-gouvernemental-charge-de-son-desarmement/"
+      }
+     ]
+    },
+    {
+     "date": "2026-10-30",
+     "cat": "politique",
+     "title": "Haïti fixe ses élections générales au 18 juillet 2027",
+     "summary": "Le Conseil électoral provisoire a programmé le premier tour le 18 juillet et un second le 4 octobre, pour un premier scrutin général en plus d'une décennie. Le Salvador a parallèlement déployé quelque 2 000 soldats après l'enlèvement de quatre de ses militaires.",
+     "links": [
+      {
+       "src": "Africanews",
+       "url": "https://www.africanews.com/2026/10/30/haiti-announces-new-election-dates-as-el-salvador-sends-troops-to-rescue-missing-soldiers/"
+      },
+      {
+       "src": "Noovo Info",
+       "url": "https://www.noovo.info/nouvelles/international/article/haiti-le-conseil-electoral-annonce-la-tenue-delections-le-18-juillet-2027/"
+      }
+     ]
+    }
+   ]
+  },
+  "HN": {
+   "checked": "2026-11-15",
+   "items": [
+    {
+     "date": "2026-11-05",
+     "cat": "politique",
+     "title": "Le Honduras prend la présidence pro tempore de la Conférence ibéro-américaine",
+     "summary": "Le président Nasry Asfura a annoncé à Madrid que son pays préparera le XXXIe Sommet ibéro-américain prévu en 2028. Le roi Felipe VI a salué cet engagement.",
+     "links": [
+      {
+       "src": "La Prensa",
+       "url": "https://www.laprensa.hn/honduras/honduras-asume-secretaria-pro-tempore-conferencia-iberoamericana-cumbre-2028-LA32549174"
+      }
+     ]
+    },
+    {
+     "date": "2026-10-30",
+     "cat": "politique",
+     "title": "Le Congrès hondurien siège à San Pedro Sula les 10 et 11 novembre",
+     "summary": "Dans le cadre du programme « Le Congrès dans ta ville », le Parlement tient une session décentralisée dans le département de Cortés pour débattre de projets à impact social et économique.",
+     "links": [
+      {
+       "src": "El Heraldo",
+       "url": "https://www.elheraldo.hn/honduras/poder-legislativo-sesionara-san-pedro-sula-durante-congreso-movil-noviembre-BM32492740"
+      }
+     ]
+    }
+   ]
+  },
+  "JM": {
+   "checked": "2026-11-15",
+   "items": [
+    {
+     "date": "2026-11-14",
+     "cat": "societe",
+     "title": "Le service des urgences de l'hôpital Cornwall Regional rouvre à Montego Bay",
+     "summary": "À la réouverture, Andrew Holness a reconnu qu'il aurait été moins coûteux de reconstruire l'hôpital que de le réhabiliter. Le chantier coûte désormais environ 25 milliards de dollars jamaïcains, plus de douze fois le budget initial.",
+     "links": [
+      {
+       "src": "Jamaica Gleaner",
+       "url": "https://jamaica-gleaner.com/article/news/20261114/holness-admits-crh-rebuild-would-have-been-cheaper"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-14",
+     "cat": "politique",
+     "title": "Jamaïque : l'office électoral veut 9 milliards pour revérifier les listes",
+     "summary": "L'Electoral Office of Jamaica compte demander des fonds pour une revérification complète du fichier électoral, que des députés jugent gonflé de personnes décédées ou émigrées.",
+     "links": [
+      {
+       "src": "Jamaica Gleaner",
+       "url": "https://jamaica-gleaner.com/article/news/20261114/push-purge-eoj-seek-9-billion-voter-reverification-mps-call-clean-list"
+      }
+     ]
+    }
+   ]
+  },
+  "MX": {
+   "checked": "2026-11-15",
+   "items": [
+    {
+     "date": "2026-11-07",
+     "cat": "politique",
+     "title": "Scandale de corruption à l'Institut national électoral mexicain",
+     "summary": "La cellule de renseignement financier a gelé les comptes de 25 personnes et 15 entreprises liées à des fournisseurs électoraux. Claudia Sheinbaum affirme que l'INE doit être « assaini » sans compromettre les élections de juin 2027.",
+     "links": [
+      {
+       "src": "Mexico News Daily",
+       "url": "https://mexiconewsdaily.com/news/mexicos-week-in-review-ine-crisis-economy-latino-voters-us-midterms/"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-07",
+     "cat": "economie",
+     "title": "La Banque du Mexique abaisse son taux directeur à 6,25 %",
+     "summary": "Banxico a réduit son taux de 25 points de base, à la surprise de la plupart des analystes, tout en relevant sa prévision d'inflation. L'excédent commercial avec les États-Unis atteint un record de 184 milliards de dollars sur neuf mois.",
+     "links": [
+      {
+       "src": "Mexico News Daily",
+       "url": "https://mexiconewsdaily.com/news/mexicos-week-in-review-ine-crisis-economy-latino-voters-us-midterms/"
+      }
+     ]
+    }
+   ]
+  },
+  "NI": {
+   "checked": "2026-11-15",
+   "items": [
+    {
+     "date": "2026-11-09",
+     "cat": "politique",
+     "title": "Daniel Ortega réapparaît en public après 68 jours d'absence",
+     "summary": "Le coprésident nicaraguayen est apparu affaibli lors d'un hommage au fondateur du FSLN, aux côtés de Rosario Murillo. Son absence prolongée, inexpliquée par les autorités, alimente les spéculations sur sa santé et la transmission du pouvoir.",
+     "links": [
+      {
+       "src": "La Prensa (EFE)",
+       "url": "https://www.laprensa.hn/mundo/daniel-ortega-reaparece-publico-meses-ausencia-nicaragua-CN32594701"
+      },
+      {
+       "src": "La Nación",
+       "url": "https://www.nacion.com/el-mundo/daniel-ortega-reaparece-en-nicaragua-tras-68-dias/5BBTXRQ6ZFCRHLUAJSR6O6JWFA/story/"
+      }
+     ]
+    }
+   ]
+  },
+  "PA": {
+   "checked": "2026-11-15",
+   "items": [
+    {
+     "date": "2026-11-14",
+     "cat": "incidents",
+     "title": "Attaque incendiaire contre le domicile d'un journaliste de La Prensa au Panama",
+     "summary": "Un engin incendiaire a été lancé contre la maison de Rolando Rodríguez, détruisant deux véhicules sans faire de blessés. Le président Mulino a condamné l'attaque et la SIP réclame une enquête rapide.",
+     "links": [
+      {
+       "src": "Acento (EFE)",
+       "url": "https://acento.com.do/internacional/atacan-con-explosivos-la-casa-de-periodista-panameno-presidente-mulino-condena-el-hecho-9790031.html"
+      }
+     ]
+    }
+   ]
+  },
+  "DO": {
+   "checked": "2026-11-15",
+   "items": [
+    {
+     "date": "2026-11-12",
+     "cat": "economie",
+     "title": "Le FMI salue la résilience de l'économie dominicaine",
+     "summary": "La croissance a atteint 5,6 % en septembre et 4,6 % sur neuf mois selon la Banque centrale. L'inflation recule à 5,14 % en octobre et Fitch a relevé la note souveraine à BB.",
+     "links": [
+      {
+       "src": "DR1",
+       "url": "https://dr1.com/news/2026/11/12/imf-praise-and-robust-5-6-september-expansion-underscore-dominican-economys-resilience-amid-global-headwinds/"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-11",
+     "cat": "politique",
+     "title": "Abinader appelle à coordonner les forces présentes en Haïti",
+     "summary": "Le président dominicain a plaidé pour une coordination entre le gouvernement haïtien, les troupes salvadoriennes et la force anti-gangs soutenue par l'ONU.",
+     "links": [
+      {
+       "src": "DR1",
+       "url": "https://dr1.com/news/2026/11/11/abinader-urges-coordination-of-haiti-government-el-salvador-forces-with-gsf-un-forces/"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-10",
+     "cat": "politique",
+     "title": "Justiniano Montero prend la tête de la Cour suprême dominicaine",
+     "summary": "Élu à l'unanimité par le Conseil de la magistrature, il promet une refonte numérique de la justice et des mesures anticorruption. Six nouveaux juges ont également prêté serment.",
+     "links": [
+      {
+       "src": "DR1",
+       "url": "https://dr1.com/news/2026/11/11/new-supreme-court-chief-justice-justiniano-montero-pledges-to-advance-judicial-modernization/"
+      }
+     ]
+    }
+   ]
+  },
+  "KN": {
+   "checked": "2026-11-15",
+   "items": [
+    {
+     "date": "2026-11-12",
+     "cat": "economie",
+     "title": "Saint-Kitts-et-Niévès discute géothermie et câbles sous-marins avec l'UE",
+     "summary": "Le Premier ministre Terrance Drew a reçu une délégation de la Commission européenne dans le cadre du Global Gateway. Les échanges ont porté sur le projet géothermique de Niévès, l'interconnexion électrique et la connectivité numérique.",
+     "links": [
+      {
+       "src": "Buckie Got It",
+       "url": "https://buckiegotit.com/2026/11/13/prime-minister-drew-and-eu-officials-discuss-geothermal-energy-digital-transformation-and-economic-diversification/"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-09",
+     "cat": "economie",
+     "title": "Saint-Kitts maintient ses subventions aux carburants",
+     "summary": "Face à la hausse des prix internationaux du diesel, le gouvernement poursuit les subventions sur l'essence, le diesel et le gaz de cuisine. Terrance Drew a appelé à un débat franc sur ce qui détermine les prix importés.",
+     "links": [
+      {
+       "src": "Buckie Got It",
+       "url": "https://buckiegotit.com/2026/11/09/prime-minister-drew-urges-frank-discussion-on-global-diesel-prices-and-the-relief-government-can-provide/"
+      }
+     ]
+    }
+   ]
+  },
+  "VC": {
+   "checked": "2026-11-15",
+   "items": [
+    {
+     "date": "2026-11-10",
+     "cat": "politique",
+     "title": "Saint-Vincent annonce un plan anticriminalité de 90 jours",
+     "summary": "Malgré un mois d'octobre sans homicide, le Premier ministre Godwin Friday lancera le 7 décembre un plan visant armes illégales, gangs et sécurité des frontières. Le pays compte déjà 42 meurtres en 2026, contre 40 l'an dernier.",
+     "links": [
+      {
+       "src": "Caribbean National Weekly",
+       "url": "https://www.caribbeannationalweekly.com/posts/st-vincent-pm-urges-continued-crime-fight-despite-murder-free-october"
+      }
+     ]
+    }
+   ]
+  },
+  "LC": {
+   "checked": "2026-11-15",
+   "items": [
+    {
+     "date": "2026-10-22",
+     "cat": "economie",
+     "title": "Sainte-Lucie exonère de taxes les « barils de Noël » jusqu'en février",
+     "summary": "Du 1er novembre 2026 à février 2027, les colis envoyés par la diaspora sont exemptés de TVA et de droits de douane pour les biens personnels, hors électronique, dans la limite de deux barils par foyer.",
+     "links": [
+      {
+       "src": "Caribbean National Weekly",
+       "url": "https://www.caribbeannationalweekly.com/posts/st-lucia-approves-christmas-barrel-concessions-from-november"
+      }
+     ]
+    }
+   ]
+  },
+  "SV": {
+   "checked": "2026-11-15",
+   "items": [
+    {
+     "date": "2026-11-06",
+     "cat": "politique",
+     "title": "Le parti de Bukele inscrit ses 60 candidats aux législatives de 2027",
+     "summary": "Nuevas Ideas, qui détient 57 des 60 sièges, a déposé ses candidatures pour les élections générales de février 2027. Les critiques dénoncent une concentration du pouvoir après des réformes autorisant la réélection indéfinie.",
+     "links": [
+      {
+       "src": "La Prensa (EFE)",
+       "url": "https://www.laprensa.hn/mundo/partido-bukele-inscribe-candidatos-congreso-comicios-2027-HC32567918"
+      }
+     ]
+    },
+    {
+     "date": "2026-10-30",
+     "cat": "politique",
+     "title": "Le Salvador déploie environ 2 000 soldats en Haïti",
+     "summary": "Ce déploiement fait suite à l'enlèvement de quatre militaires salvadoriens servant aux côtés de la force anti-gangs soutenue par l'ONU. San Salvador a prolongé sa participation jusqu'en octobre 2027.",
+     "links": [
+      {
+       "src": "Africanews",
+       "url": "https://www.africanews.com/2026/10/30/haiti-announces-new-election-dates-as-el-salvador-sends-troops-to-rescue-missing-soldiers/"
+      }
+     ]
+    }
+   ]
+  },
+  "TT": {
+   "checked": "2026-11-15",
+   "items": [
+    {
+     "date": "2026-11-14",
+     "cat": "societe",
+     "title": "Décès de la calypsonienne Marvellous Marva",
+     "summary": "Membre du groupe féminin United Sisters, Marva Joseph a marqué plus de quarante ans de calypso avec des chansons engagées. Sa disparition est saluée comme une perte pour la culture trinidadienne.",
+     "links": [
+      {
+       "src": "Trinidad Guardian",
+       "url": "https://www.guardian.co.tt/news/marvellous-marva-dies-after-four-decades-in-calypso-6.2.2710441.25c9ee7fbf"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-10",
+     "cat": "politique",
+     "title": "Première « zone fermée » sous couvre-feu en vertu de la nouvelle loi sécuritaire",
+     "summary": "La cité Maloney Buildings, à D'Abadie, est la première zone déclarée fermée en application de la loi sur les opérations spéciales, avec un couvre-feu nocturne. L'opposition dénonce un manque d'information des habitants.",
+     "links": [
+      {
+       "src": "Trinidad Guardian",
+       "url": "https://www.guardian.co.tt/news/maloney-first-community-declared-closed-area-under-new-law-6.2.2707769.66b6637c14"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-08",
+     "cat": "incidents",
+     "title": "Collision de bateaux de plaisance à Chaguaramas : six morts",
+     "summary": "Deux embarcations se sont percutées près de Point Cannings, faisant 26 blessés. Les garde-côtes et les secours ont retrouvé six corps en trois jours.",
+     "links": [
+      {
+       "src": "Trinidad Guardian",
+       "url": "https://www.guardian.co.tt/news/sixth-body-found-in-chaguaramas-boating-tragedy-6.2.2710366.a6356a6291"
+      }
+     ]
+    },
+    {
+     "date": "2026-10-31",
+     "cat": "societe",
+     "title": "Marche syndicale contre la politique du gouvernement Persad-Bissessar",
+     "summary": "Une douzaine de syndicats ont défilé à Port of Spain contre la politique sociale du gouvernement. La Première ministre a qualifié la manifestation de « marche de la haine », ce que l'opposition conteste.",
+     "links": [
+      {
+       "src": "Jamaica Observer",
+       "url": "https://www.jamaicaobserver.com/2026/10/31/workers-protest-policies-trinidad-tobago-government/"
+      }
+     ]
+    }
+   ]
+  }
+ }
+}
