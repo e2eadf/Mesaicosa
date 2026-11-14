@@ -1,4 +1,5 @@
-import { geoNaturalEarth1, geoPath, geoArea, zoom, zoomIdentity, zoomTransform, interpolateZoom, select, feature } from '../../vendor/geo.js';
+import { geoNaturalEarth1, geoPath, geoArea, zoom, zoomIdentity, zoomTransform, interpolateZoom, select } from '../../vendor/geo.js';
+import { loadWorld } from '../geodata.js';
 
 const nf = new Intl.NumberFormat('fr-FR');
 const curName = code => { try { const n = new Intl.DisplayNames(['fr'], { type: 'currency' }).of(code); return n.charAt(0).toUpperCase() + n.slice(1); } catch { return code; } };
@@ -8,20 +9,7 @@ const ALL = 'Tous les continents';
 const REGIONS = [ALL, 'Europe', 'Afrique', 'Asie', 'Amérique du Nord et centrale', 'Amérique du Sud', 'Océanie'];
 const MODES = [['ou', 'Où est… ?'], ['nom', 'Quel est ce pays ?'], ['cap', 'Capitales']];
 const COUNTS = [[10, '10'], [25, '25'], [0, 'Tous']];
-let cache = null;
-
-async function loadData() {
-  if (cache) return cache;
-  const [topo, info, flags] = await Promise.all([
-    fetch('data/world.json').then(r => r.json()),
-    fetch('data/countries.json').then(r => r.json()),
-    fetch('data/flags.json').then(r => r.json()).catch(() => ({})),
-  ]);
-  const feats = feature(topo, topo.objects.countries).features;
-  feats.forEach(f => { f.info = info[f.id] || { n: f.properties.name, r: '?' }; });
-  cache = { feats, info, flags };
-  return cache;
-}
+const loadData = () => loadWorld();
 
 // plus grand polygone d'un pays (évite que la Guyane étire le cadrage de la France)
 function mainPart(f) {
@@ -72,7 +60,7 @@ export function mount(el, api) {
           <div><div class="small muted" style="margin-bottom:6px">Nombre de questions</div>${seg('count', COUNTS, count)}
             <div class="tiny muted" id="cnt-info" style="margin-top:4px"></div></div>
           <label class="row small" style="gap:8px;flex-wrap:nowrap;align-items:flex-start"><input type="checkbox" id="terr" ${terr ? 'checked' : ''} style="margin-top:3px">
-            <span>Inclure les territoires dépendants (Groenland, Nouvelle-Calédonie, Porto Rico, Hong Kong…) et les États non membres de l'ONU (Vatican, Palestine, Kosovo, Taïwan)</span></label>
+            <span>Inclure les territoires et l'outre-mer (La Réunion, Guadeloupe, Groenland, Nouvelle-Calédonie, Porto Rico, Canaries…) et les États non membres de l'ONU (Vatican, Palestine, Kosovo, Taïwan)</span></label>
           <div><button class="btn primary" id="go">Commencer</button></div>
         </div>
         <p class="tiny muted" style="margin-bottom:0">Touche un pays pour le sélectionner, puis « Valider » (ou touche-le deux fois de suite). Les pays que tu rates reviennent plus souvent. Pince ou molette pour zoomer, glisse pour te déplacer.</p>
@@ -264,8 +252,8 @@ export function mount(el, api) {
       <div class="fiche-name">${esc(i.n)}</div>
       <dl>
         ${i.st ? `<dt>Statut</dt><dd>${esc(i.st)}</dd>` : ''}
-        ${i.c && i.c !== '—' ? `<dt>Capitale</dt><dd>${esc(i.c)}</dd>` : ''}
-        ${i.p ? `<dt>Population</dt><dd>${nf.format(i.p)}${i.py ? ` <span class="tiny muted">(${i.py})</span>` : ''}</dd>` : ''}
+        ${i.c && i.c !== '—' ? `<dt>${i.om ? 'Chef-lieu' : 'Capitale'}</dt><dd>${esc(i.c)}</dd>` : ''}
+        ${i.p ? `<dt>Population</dt><dd>${i.pa ? '≈ ' : ''}${nf.format(i.p)}${i.py ? ` <span class="tiny muted">(${i.py})</span>` : ''}</dd>` : ''}
         ${i.a ? `<dt>Superficie</dt><dd>${nf.format(i.a)} km²</dd>` : ''}
         ${i.cur?.length ? `<dt>Monnaie</dt><dd>${i.cur.map(c => `${esc(curName(c))} (${esc(c)})`).join(', ')}</dd>` : ''}
         <dt>Continent</dt><dd>${esc(i.r)}</dd>
@@ -273,7 +261,7 @@ export function mount(el, api) {
       <div class="tiny muted fiche-next">Touche la carte ou la fiche pour continuer</div></div>`);
     const fiche = el.querySelector('#fiche');
     fiche.addEventListener('click', e => { e.stopPropagation(); next(); });
-    el.querySelector('#say').addEventListener('click', e => { e.stopPropagation(); speak(`${i.n}. Capitale : ${i.c || 'aucune'}.`); });
+    el.querySelector('#say').addEventListener('click', e => { e.stopPropagation(); speak(`${i.n}. ${i.om ? 'Chef-lieu' : 'Capitale'} : ${i.c || 'aucune'}.`); });
     if (mode === 'nom') {
       el.querySelector('#choices').insertAdjacentHTML('beforeend', '<button class="btn primary" id="nxt">Suivant</button>');
       el.querySelector('#nxt').onclick = next;

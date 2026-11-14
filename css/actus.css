@@ -1,0 +1,10 @@
+/* actus */
+.map-wrap path.land.news-h1{fill:color-mix(in srgb,var(--accent) 25%,var(--vie-bg))}
+.map-wrap path.land.news-h2{fill:color-mix(in srgb,var(--accent) 55%,var(--vie-bg))}
+.map-wrap path.land.news-h3{fill:var(--accent)}
+.news-links{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:6px}
+.news-link{font-size:13px;text-decoration:none}
+.news-link:hover{text-decoration:underline}
+.news-item{padding:8px 0;border-top:1px solid var(--line)}
+.news-item:first-of-type{border-top:none}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px}
