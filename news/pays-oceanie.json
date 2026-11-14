@@ -1,0 +1,527 @@
+{
+ "updated": "2026-11-14T22:52:00+01:00",
+ "countries": {
+  "AU": {
+   "checked": "2026-11-14",
+   "items": [
+    {
+     "date": "2026-11-14",
+     "cat": "politique",
+     "title": "Albanese à Manille pour l'ASEAN, signature d'un pacte de défense avec les Philippines",
+     "summary": "Le Premier ministre australien participe au sommet de l'ASEAN à Manille, où un accord de défense doit marquer un nouveau palier de coopération militaire avec les Philippines, pour les 80 ans de leurs relations diplomatiques. Une rencontre avec Donald Trump est possible en marge du sommet, sur fond de tensions autour des droits de douane et des prix du carburant.",
+     "links": [
+      {
+       "src": "AAP / Newcastle Herald",
+       "url": "https://www.newcastleherald.com.au/story/9391656/pm-to-highlight-philippines-ties-ahead-of-trump-meeting/"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-11",
+     "cat": "economie",
+     "title": "Crédits immobiliers : chute trimestrielle record, les investisseurs se retirent",
+     "summary": "Selon le Bureau australien des statistiques, la valeur des nouveaux prêts immobiliers a reculé de 15,5 % au troisième trimestre, la plus forte baisse depuis 2002. Les prêts aux investisseurs ont plongé d'environ 32 %, sous l'effet des hausses de taux et des réformes fiscales envisagées.",
+     "links": [
+      {
+       "src": "ABS",
+       "url": "https://www.abs.gov.au/media-centre/media-releases/largest-quarterly-falls-record-led-loans-investors"
+      },
+      {
+       "src": "The Nightly",
+       "url": "https://thenightly.com.au/politics/australia/new-home-loan-data-reveals-largest-investor-lending-plunge-on-record-amid-rate-rises-negative-gearing-changes-c-23145950"
+      }
+     ]
+    }
+   ]
+  },
+  "FJ": {
+   "checked": "2026-11-14",
+   "items": [
+    {
+     "date": "2026-11-09",
+     "cat": "societe",
+     "title": "Coupe du monde de rugby à XIII : les nations du Pacifique échouent en demi-finale",
+     "summary": "Samoa, Tonga et les Fidji ont réalisé des parcours remarqués lors des Coupes du monde masculine et féminine de rugby à XIII, sans toutefois atteindre la finale.",
+     "links": [
+      {
+       "src": "RNZ",
+       "url": "https://www.rnz.co.nz/news/pacific/2465317/pacific-island-teams-fall-short-in-rlwc-semifinals-despite-historic-campaigns"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-06",
+     "cat": "economie",
+     "title": "Fiji Airways : la facture de carburant flambe, une nouvelle perte attendue",
+     "summary": "La compagnie nationale voit ses coûts de carburant grimper de près de 300 millions de dollars fidjiens et anticipe une nouvelle perte annuelle. La crise régionale des carburants pèse lourdement sur le transport aérien du Pacifique.",
+     "links": [
+      {
+       "src": "Fiji Village",
+       "url": "https://www.fijivillage.com/news/fuel-costs-rise-by-nearly-300m-for-fiji-airways-another-loss-expected-scurrah-176b44/"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-05",
+     "cat": "sciences",
+     "title": "Octobre le plus sec jamais enregistré dans quatre stations météo",
+     "summary": "Quatre stations météorologiques des Fidji ont relevé leur mois d'octobre le plus sec de l'histoire, conséquence de l'épisode El Niño en cours. La sécheresse menace l'approvisionnement en eau et l'agriculture.",
+     "links": [
+      {
+       "src": "Fiji Sun",
+       "url": "https://fijisun.com.fj/news/weather/four-fiji-weather-stations-record-driest-october-in-history"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-02",
+     "cat": "politique",
+     "title": "Réforme constitutionnelle : Rabuka repousse le vote, le référendum compromis",
+     "summary": "Le Premier ministre Sitiveni Rabuka a reporté l'examen du projet d'amendement constitutionnel 2026, faute de majorité des deux tiers après l'opposition du NFP et du Sodelpa. Le référendum envisagé le 9 décembre est suspendu, alors que les élections doivent avoir lieu avant le 6 février 2027.",
+     "links": [
+      {
+       "src": "Scoop / RNZ Pacific",
+       "url": "https://www.scoop.co.nz/stories/WO2611/S00009/fiji-pm-rabuka-delays-vote-on-constitution-bill-after-mounting-pressure.htm"
+      }
+     ]
+    }
+   ]
+  },
+  "FM": {
+   "checked": "2026-11-14",
+   "items": [
+    {
+     "date": "2026-11-13",
+     "cat": "sciences",
+     "title": "COP31 : le président Simina appelle à agir d'urgence sur le méthane",
+     "summary": "Dans la déclaration nationale des États fédérés de Micronésie, Wesley Simina a plaidé pour des réductions rapides du méthane afin de limiter le dépassement de 1,5 °C. La Première dame a porté la voix du Pacifique dans un dialogue mondial sur le zéro déchet.",
+     "links": [
+      {
+       "src": "Gouvernement FSM",
+       "url": "https://gov.fm/every-fraction-of-a-degree-counts-president-simina-calls-for-urgent-methane-action-to-limit-1-5c-overshoot-at-cop31/"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-04",
+     "cat": "politique",
+     "title": "Le président promulgue des lois du 24e Congrès",
+     "summary": "Wesley Simina a signé des textes adoptés lors de la cinquième session ordinaire du Congrès, portant sur les infrastructures, les services publics et les programmes sociaux.",
+     "links": [
+      {
+       "src": "Gouvernement FSM",
+       "url": "https://gov.fm/10192-2/"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-03",
+     "cat": "societe",
+     "title": "Les États fédérés de Micronésie célèbrent 40 ans d'indépendance",
+     "summary": "Une cérémonie de lever de drapeau s'est tenue à Palikir pour marquer les quatre décennies d'indépendance du pays.",
+     "links": [
+      {
+       "src": "Gouvernement FSM",
+       "url": "https://gov.fm/fsm-celebrates-40-years-of-independence-with-flag-raising-ceremony/"
+      }
+     ]
+    }
+   ]
+  },
+  "KI": {
+   "checked": "2026-11-14",
+   "items": [
+    {
+     "date": "2026-11-12",
+     "cat": "sciences",
+     "title": "COP31 : Kiribati réclame un accès plus rapide aux fonds climatiques",
+     "summary": "La ministre Ruth Cross Kwansing appelle à réformer les procédures d'accès à la finance climatique, jugées trop lentes pour les pays vulnérables du Pacifique. Kiribati, archipel d'atolls très exposé, fait partie des États les plus menacés par la montée des eaux.",
+     "links": [
+      {
+       "src": "RNZ",
+       "url": "https://www.rnz.co.nz/news/pacific/2551214/kiribati-minister-calls-for-faster-access-to-climate-funds-for-vulnerable-pacific-nations"
+      }
+     ]
+    }
+   ]
+  },
+  "MH": {
+   "checked": "2026-11-14",
+   "items": [
+    {
+     "date": "2026-11-12",
+     "cat": "sciences",
+     "title": "COP31 : Hilda Heine juge tout dépassement de 1,5 °C inacceptable pour le Pacifique",
+     "summary": "La présidente des Îles Marshall a averti à Antalya que tout réchauffement supplémentaire serait catastrophique pour les nations insulaires. Elle a appelé à une action climatique urgente, estimant que « le monde que nous connaissons » est en jeu.",
+     "links": [
+      {
+       "src": "RNZ",
+       "url": "https://www.rnz.co.nz/news/pacific/2591454/cop31-hears-1-point-5-degreesc-overshoot-not-an-option-for-pacific"
+      },
+      {
+       "src": "Island Times",
+       "url": "https://islandtimes.org/the-world-we-know-is-over-without-urgent-climate-action-leaders-tell-cop31/"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-11",
+     "cat": "economie",
+     "title": "Le directeur des pêches Glen Joseph prendra la tête de l'office PNA",
+     "summary": "Glen Joseph, directeur des pêches des Îles Marshall, deviendra le 1er janvier 2027 directeur général de l'office des Parties à l'Accord de Nauru, qui gère une grande partie de la pêche thonière du Pacifique.",
+     "links": [
+      {
+       "src": "RNZ",
+       "url": "https://www.rnz.co.nz/news/pacific/2530560/marshall-islands-fisheries-chief-glen-joseph-to-lead-regional-fisheries-body"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-04",
+     "cat": "sciences",
+     "title": "La Banque mondiale débloque 11 M$ face à El Niño et à une épidémie de dengue",
+     "summary": "Après l'état d'urgence décrété le 8 octobre, la Banque mondiale a libéré 11 millions de dollars via un mécanisme de financement préétabli. Le pays subit sécheresse et houles liées à El Niño, ainsi qu'une épidémie de dengue à Majuro et Ebeye.",
+     "links": [
+      {
+       "src": "Marshall Islands Journal",
+       "url": "https://marshallislandsjournal.com/11m-el-nino-relief/"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-02",
+     "cat": "politique",
+     "title": "Le Pacifique soutient la quête de justice nucléaire des Îles Marshall",
+     "summary": "Les pays de la région ont affiché leur appui à la campagne des Îles Marshall réclamant réparation pour les essais nucléaires américains menés sur leur territoire.",
+     "links": [
+      {
+       "src": "Island Times",
+       "url": "https://islandtimes.org/pacific-backs-marshall-islands-nuclear-justice-push/"
+      }
+     ]
+    }
+   ]
+  },
+  "NR": {
+   "checked": "2026-11-14",
+   "items": [
+    {
+     "date": "2026-11-11",
+     "cat": "politique",
+     "title": "Nauru : plus d'opposition, les 19 députés rallient le gouvernement",
+     "summary": "Pour la première fois depuis l'indépendance en 1968, tous les élus du Parlement soutiennent le gouvernement du président David Adeang, laissant le pays sans banc d'opposition. Des experts s'interrogent sur le contrôle de l'exécutif dans ce Parlement monocaméral.",
+     "links": [
+      {
+       "src": "PMN",
+       "url": "https://pmn.co.nz/read/political/naoero-s-united-parliament-faces-its-biggest-test-yet"
+      },
+      {
+       "src": "RNZ",
+       "url": "https://www.rnz.co.nz/news/pacific/2556147/no-opposition-left-in-naoero-after-all-mps-join-government"
+      }
+     ]
+    }
+   ]
+  },
+  "NZ": {
+   "checked": "2026-11-14",
+   "items": [
+    {
+     "date": "2026-11-13",
+     "cat": "politique",
+     "title": "Législatives : les électorats à forte population pacifique ont voté de façon homogène",
+     "summary": "Dans les circonscriptions comptant de nombreux électeurs d'origine pacifique, le vote a de nouveau penché nettement vers un même dirigeant. Des députés pasifika de tous bords se sont engagés à défendre leurs communautés au nouveau Parlement.",
+     "links": [
+      {
+       "src": "RNZ",
+       "url": "https://www.rnz.co.nz/news/pacific/2573521/voters-in-areas-with-large-pacific-populations-clear-on-who-should-lead-country"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-08",
+     "cat": "politique",
+     "title": "Législatives sans vainqueur net : le résultat final attendu le 27 novembre",
+     "summary": "Au scrutin du 7 novembre, le Parti national de Christopher Luxon et le Parti travailliste de Chris Hipkins sont au coude-à-coude. Le bloc de droite détient provisoirement 67 sièges sur 131, mais environ 400 000 votes spéciaux restent à dépouiller ; le nouveau parti Opportunity pourrait jouer les arbitres.",
+     "links": [
+      {
+       "src": "AP / NHPR",
+       "url": "https://www.nhpr.org/2026-11-08/no-clear-winner-in-new-zealand-election-as-leaders-prepare-for-weeks-of-talks"
+      },
+      {
+       "src": "The Spinoff",
+       "url": "https://thespinoff.co.nz/politics/08-11-2026/the-hangover-key-takeaways-and-reactions-from-election-2026"
+      }
+     ]
+    }
+   ]
+  },
+  "PG": {
+   "checked": "2026-11-14",
+   "items": [
+    {
+     "date": "2026-11-12",
+     "cat": "societe",
+     "title": "Tennis : Violet Apisah en lice pour une place à l'Open d'Australie",
+     "summary": "La joueuse papouane a reçu une invitation pour un tournoi qualificatif ouvrant l'accès à l'Open d'Australie.",
+     "links": [
+      {
+       "src": "RNZ",
+       "url": "https://www.rnz.co.nz/news/pacific/2550186/papua-new-guinea-s-violet-apisah-to-compete-for-a-spot-at-australian-open"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-09",
+     "cat": "societe",
+     "title": "Marape lance une politique « pas plus de trois enfants »",
+     "summary": "Le gouvernement de James Marape veut encourager les familles à se limiter à trois enfants pour maîtriser la forte natalité du pays.",
+     "links": [
+      {
+       "src": "RNZ",
+       "url": "https://www.rnz.co.nz/news/pacific/2463213/marape-unveils-no-more-than-three-children-policy-to-manage-png-s-high-birth-rate"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-09",
+     "cat": "politique",
+     "title": "Taïwan ferme son bureau à Port Moresby et met fin à son aide",
+     "summary": "Après la réaffirmation par la PNG de la politique d'une seule Chine, Taïwan retire son personnel et cesse sa coopération. Taipei, qui absorbait environ un tiers des exportations de GNL papoues, ne signera plus de nouveaux contrats spot.",
+     "links": [
+      {
+       "src": "Islands Business",
+       "url": "https://islandsbusiness.com/news-break/taiwan-closes-png-office-and-ends-aid/"
+      }
+     ]
+    }
+   ]
+  },
+  "PW": {
+   "checked": "2026-11-14",
+   "items": [
+    {
+     "date": "2026-11-13",
+     "cat": "economie",
+     "title": "Le Congrès adopte une loi sur l'immatriculation des aéronefs",
+     "summary": "Un projet élargissant l'immatriculation des aéronefs civils et le rôle de l'autorité de l'aviation a été voté par le Congrès des Palaos et attend la signature du président.",
+     "links": [
+      {
+       "src": "Island Times",
+       "url": "https://islandtimes.org/palau-aircraft-registry-bill-clears-congress-awaits-presidents-signature/"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-09",
+     "cat": "economie",
+     "title": "Visa « élite » modernisé, ouvert aux investissements immobiliers",
+     "summary": "Le président a signé une réforme permettant aux candidats étrangers de se qualifier pour ce programme de visa via des investissements liés à l'immobilier.",
+     "links": [
+      {
+       "src": "Island Times",
+       "url": "https://islandtimes.org/palau-modernizes-elite-visa-program-opens-door-to-broader-property-investment/"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-05",
+     "cat": "economie",
+     "title": "Qantas ajoute un deuxième vol hebdomadaire Brisbane–Palaos",
+     "summary": "Face à une hausse de 55 % des visiteurs australiens, Qantas ouvrira une deuxième rotation hebdomadaire à partir du 2 décembre.",
+     "links": [
+      {
+       "src": "Island Times",
+       "url": "https://islandtimes.org/qantas-adds-second-weekly-flight-from-brisbane-to-palau-as-australian-visitors-rise-55/"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-05",
+     "cat": "sciences",
+     "title": "L'hôpital Tripler lève son quota de patients venant des Palaos",
+     "summary": "Le centre médical militaire Tripler, à Hawaï, supprime son plafond de patients, ce qui ouvre davantage d'orientations médicales gratuites pour les Palaosiens.",
+     "links": [
+      {
+       "src": "Island Times",
+       "url": "https://islandtimes.org/tripler-removes-patient-cap-opening-more-free-medical-referrals-for-palau/"
+      }
+     ]
+    }
+   ]
+  },
+  "SB": {
+   "checked": "2026-11-14",
+   "items": [
+    {
+     "date": "2026-11-12",
+     "cat": "sciences",
+     "title": "« Notre île n'existe plus » : un documentaire salomonais présenté à la COP31",
+     "summary": "Le documentaire en réalité virtuelle Solwata, narré par Mark Ruffalo, suit des habitants des Îles Salomon contraints de quitter leurs foyers face à la montée des eaux. Il est présenté aux délégués de la COP31.",
+     "links": [
+      {
+       "src": "RNZ",
+       "url": "https://www.rnz.co.nz/news/pacific/2551541/our-island-no-longer-exists-solomon-islands-climate-documentary-heads-to-cop31"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-08",
+     "cat": "sciences",
+     "title": "Tetepare : des trocas plus grands dans l'aire marine protégée",
+     "summary": "Une étude menée dans l'aire marine protégée de Tetepare a relevé des coquillages trocas de plus grande taille, signe de l'efficacité de la protection locale.",
+     "links": [
+      {
+       "src": "Solomon Star",
+       "url": "https://www.solomonstarnews.com/tetepare-marine-protected-area-records-larger-trochus-survey-finds/"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-03",
+     "cat": "politique",
+     "title": "Le gouvernement Wale prépare des réformes constitutionnelles contre l'instabilité",
+     "summary": "La coalition au pouvoir avance un paquet d'amendements (anti-défection, stabilité de la législature, indépendance des institutions) qui nécessitera des majorités qualifiées. Le Premier ministre Matthew Wale, soigné en Australie, se dit rétabli et prêt à reprendre ses fonctions.",
+     "links": [
+      {
+       "src": "PACNEWS / Islands Business",
+       "url": "https://islandsbusiness.com/pacnews/pacnews-one-03-november-2026/"
+      }
+     ]
+    }
+   ]
+  },
+  "TO": {
+   "checked": "2026-11-14",
+   "items": [
+    {
+     "date": "2026-11-13",
+     "cat": "societe",
+     "title": "Jason Taumalolo intronisé au premier Hall of Legends du rugby à XIII",
+     "summary": "Le co-capitaine des Tonga figurera parmi les premiers membres du nouveau panthéon international du rugby à XIII, après une Coupe du monde où Tonga a atteint les demi-finales.",
+     "links": [
+      {
+       "src": "RNZ",
+       "url": "https://www.rnz.co.nz/news/pacific/2575950/tonga-s-taumalolo-makes-hall-of-legends"
+      },
+      {
+       "src": "RNZ",
+       "url": "https://www.rnz.co.nz/news/pacific/2465317/pacific-island-teams-fall-short-in-rlwc-semifinals-despite-historic-campaigns"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-05",
+     "cat": "sciences",
+     "title": "Sécheresse El Niño : la population appelée à économiser l'eau",
+     "summary": "Les autorités tongiennes invitent les habitants à réduire leur consommation d'eau alors que la sécheresse liée à El Niño s'intensifie dans le Pacifique.",
+     "links": [
+      {
+       "src": "Matangi Tonga",
+       "url": "https://matangitonga.to/2026/11/05/tonga-warned-conserve-water-el-ni-o-drought-intensifies"
+      }
+     ]
+    }
+   ]
+  },
+  "TV": {
+   "checked": "2026-11-14",
+   "items": [
+    {
+     "date": "2026-10-30",
+     "cat": "economie",
+     "title": "Le fonds souverain de Tuvalu investi dans les énergies fossiles",
+     "summary": "Des documents montrent que le fonds fiduciaire national détient indirectement des participations dans des entreprises fossiles, un paradoxe pour ce pays en pointe du combat climatique. Le gouvernement dispose de peu de leviers pour l'empêcher.",
+     "links": [
+      {
+       "src": "RNZ",
+       "url": "https://www.rnz.co.nz/news/pacific/2237267/tuvalu-faces-fossil-fuel-dilemma-in-management-of-its-national-investment-fund"
+      }
+     ]
+    }
+   ]
+  },
+  "VU": {
+   "checked": "2026-11-14",
+   "items": [
+    {
+     "date": "2026-11-09",
+     "cat": "politique",
+     "title": "La motion de censure contre le Premier ministre Napat retirée avant le vote",
+     "summary": "L'opposition a renoncé à sa motion de défiance contre Jotham Napat, qui affirme que sa coalition de cinq partis reste unie.",
+     "links": [
+      {
+       "src": "RNZ",
+       "url": "https://www.rnz.co.nz/news/pacific/2460411/coalition-united-no-confidence-motion-against-vanuatu-pm-napat-withdrawn-before-vote"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-09",
+     "cat": "sciences",
+     "title": "Épidémie de grippe dans la province de Tafea (Tanna)",
+     "summary": "Une flambée de grippe est signalée sur l'île de Tanna, dans le sud de l'archipel, selon le bulletin régional de RNZ Pacific.",
+     "links": [
+      {
+       "src": "RNZ",
+       "url": "https://www.rnz.co.nz/news/pacific/2471182/pacific-news-in-brief-for-9-november"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-08",
+     "cat": "sciences",
+     "title": "Lancement d'un système de blocage des contenus pédocriminels en ligne",
+     "summary": "Le Vanuatu met en service un dispositif destiné à bloquer l'accès aux contenus d'abus sexuels sur mineurs sur Internet.",
+     "links": [
+      {
+       "src": "VBTC",
+       "url": "https://vbtc.vu/system-block-child-sexual-abuse-material-online/"
+      }
+     ]
+    }
+   ]
+  },
+  "WS": {
+   "checked": "2026-11-14",
+   "items": [
+    {
+     "date": "2026-11-11",
+     "cat": "societe",
+     "title": "Rugby à XIII : Spencer Leniu relance le débat sur la rémunération des joueurs",
+     "summary": "Exclu en demi-finale de Coupe du monde pour un geste évoquant l'argent, le joueur des Toa Samoa risque une suspension. Il accuse les instances d'exploiter les joueurs du Pacifique sans les rémunérer équitablement.",
+     "links": [
+      {
+       "src": "RNZ",
+       "url": "https://www.rnz.co.nz/news/pacific/2489011/league-pay-debate-reignites-as-toa-samoa-s-spencer-leniu-faces-ban-for-money-gesture"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-09",
+     "cat": "societe",
+     "title": "Samoa parmi les destinations à visiter en 2027 selon Lonely Planet",
+     "summary": "Le guide Lonely Planet classe Samoa, avec deux autres pays du Pacifique, parmi les meilleures destinations de voyage pour 2027.",
+     "links": [
+      {
+       "src": "Samoa Global News",
+       "url": "https://samoaglobalnews.com/lonely-planet-declares-samoa-and-two-other-pacific-countries-among-the-best-places-to-travel-in-2027/"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-05",
+     "cat": "politique",
+     "title": "Liberté de la presse : Samoa interpellé à l'ONU",
+     "summary": "Le gouvernement samoan a été invité devant l'ONU à répondre au recul de la liberté des médias, alors que le Samoa Observer reste exclu des activités gouvernementales.",
+     "links": [
+      {
+       "src": "Asia Pacific Report / RNZ",
+       "url": "https://asiapacificreport.nz/2026/11/05/samoa-government-urged-at-un-to-address-declining-media-freedom/"
+      }
+     ]
+    }
+   ]
+  }
+ }
+}
