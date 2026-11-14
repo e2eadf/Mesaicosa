@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-14T23:15:42+01:00",
+ "updated": "2026-11-14T23:18:20+01:00",
  "countries": {
   "AR": {
    "checked": "2026-11-14",
@@ -229,7 +229,36 @@
   },
   "GY": {
    "checked": "2026-11-14",
-   "items": []
+   "items": [
+    {
+     "date": "2026-11-12",
+     "cat": "economie",
+     "title": "Feu vert au projet gazier Longtail d'ExxonMobil (12,5 milliards $)",
+     "summary": "Le ministère des Ressources naturelles a approuvé le plan de développement et délivré la licence de production du champ Longtail, premier grand projet gazier du pays. ExxonMobil a pris sa décision d'investissement le même jour et vise un démarrage en 2030.",
+     "links": [
+      {
+       "src": "The Rio Times",
+       "url": "https://riotimesonline.com/guyana-approves-exxon-longtail-gas-project-2026"
+      }
+     ]
+    },
+    {
+     "date": "2026-11-07",
+     "cat": "incidents",
+     "title": "Incendie d'un commerce près du marché Stabroek à Georgetown",
+     "summary": "Un violent incendie a ravagé un bâtiment commercial à l'angle des rues Coal et Cornhill. Les pompiers sont parvenus à éviter sa propagation aux immeubles voisins ; aucune victime n'a été signalée.",
+     "links": [
+      {
+       "src": "Demerara Waves",
+       "url": "https://demerarawaves.com/2026/11/07/fire-guts-chinese-store-near-kfc-on-stabroek-market-square/"
+      },
+      {
+       "src": "Guyana Chronicle",
+       "url": "https://guyanachronicle.com/2026/11/14/firefighters-commended-for-containing-major-stabroek-blaze"
+      }
+     ]
+    }
+   ]
   },
   "PE": {
    "checked": "2026-11-14",
