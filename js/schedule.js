@@ -16,7 +16,7 @@ export const MODULES = {
   finance:   { name: 'Finance (cartes)', ready: true, where: 'Téléphone ou ordinateur', icon: '€' },
   eloquence: { name: 'Éloquence',      ready: false, where: 'Ordinateur (voix)', icon: '◔' },
   ia:        { name: "Comprendre l'IA", ready: false, where: 'Téléphone', icon: '◇' },
-  actus:     { name: 'Actus des pays', ready: false, where: 'Téléphone', icon: '◎' },
+  actus:     { name: 'Actus', ready: true, where: 'Téléphone ou ordinateur', icon: '◎' },
   bible:     { name: 'Versets bibliques', ready: true, where: 'Téléphone ou ordinateur', icon: '✝' },
 };
 
