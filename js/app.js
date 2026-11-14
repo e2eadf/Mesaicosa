@@ -2,7 +2,7 @@ import * as S from './store.js';
 import { CATS, MODULES, minutes, blocksFor, sleepFor, isWeekday, templateDay, variantFor, overrideFor } from './schedule.js';
 import { mountEditor } from './editor.js';
 
-export const APP_VERSION = '2.1.1';
+export const APP_VERSION = '2.1.2';
 const view = document.getElementById('view');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const today = () => S.isoDate(new Date());
@@ -338,7 +338,8 @@ function viewCompass(section) {
   const past = st.reviews.filter(r => r.week !== mon).sort((a, b) => b.week.localeCompare(a.week)).slice(0, 4);
 
   render(`
-    <h1>Boussole</h1>
+    <div class="spread"><h1>Boussole</h1><button class="btn small" id="for-claude">📋 Copier pour Claude</button></div>
+    <div id="for-claude-out"></div>
     <p class="muted small">Ce que tu vises, et l'importance de chaque domaine. Les priorités orientent les suggestions du Gymnase.</p>
     <h2>Objectifs</h2>
     <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr))">${HORIZONS.map(hz).join('')}</div>
@@ -368,6 +369,34 @@ function viewCompass(section) {
     </div>
   `);
   if (section === 'revue') document.getElementById('revue').scrollIntoView();
+
+  // Résumé lisible à coller dans la conversation avec Claude (seulement ce que l'utilisateur choisit de partager)
+  document.getElementById('for-claude').onclick = async () => {
+    const lines = [`MESAICOSA — résumé de la Boussole pour Claude (${new Date().toLocaleDateString('fr-FR')})`, '', 'Priorités :'];
+    for (const [n, lbl] of [[3, 'Priorité'], [2, 'Normal'], [1, 'Maintien']]) {
+      const ds = DOMS.filter(([id]) => S.getMap('weights', id, 2) === n).map(d => d[1]);
+      if (ds.length) lines.push(`- ${lbl} : ${ds.join(' · ')}`);
+    }
+    lines.push('', 'Objectifs :');
+    for (const [k, t] of HORIZONS) {
+      const list = objs.filter(o => o.horizon === k);
+      lines.push(`- ${t} : ${list.length ? list.map(o => `${o.done ? '[fait] ' : ''}${o.text}${o.domain ? ` (${domName(o.domain)})` : ''}`).join(' ; ') : 'aucun'}`);
+    }
+    lines.push('', `Semaine du ${mon} : ${done} / ${plan} créneaux cochés ; séances Gymnase : ${sess.length} (${perMod})`);
+    if (rev.wins || rev.blocks || rev.focus) lines.push(`Revue : réussites — ${rev.wins || '—'} ; blocages — ${rev.blocks || '—'} ; focus — ${rev.focus || '—'}`);
+    const text = lines.join('\n');
+    const out = document.getElementById('for-claude-out');
+    let copied = false;
+    try { await navigator.clipboard.writeText(text); copied = true; } catch { }
+    out.innerHTML = `<div class="card" style="margin:10px 0;border-color:var(--accent)">
+      <p class="small" style="margin-top:0">${copied ? 'Résumé copié : colle-le dans ta conversation avec Claude.' : 'Sélectionne le texte ci-dessous et copie-le.'} Il ne contient que tes priorités, tes objectifs et le bilan de la semaine.</p>
+      <textarea readonly style="min-height:160px;font-size:13px">${esc(text)}</textarea>
+      <div class="row" style="margin-top:8px">${navigator.share ? '<button class="btn small" id="fc-share">Partager…</button>' : ''}<button class="btn small ghost" id="fc-close">Fermer</button></div></div>`;
+    if (!copied) out.querySelector('textarea').select();
+    out.querySelector('#fc-close').onclick = () => { out.innerHTML = ''; };
+    out.querySelector('#fc-share')?.addEventListener('click', () => navigator.share({ text }).catch(() => {}));
+    toast(copied ? 'Résumé copié' : 'Résumé prêt à copier');
+  };
 
   view.querySelectorAll('form[data-hz]').forEach(f => {
     const err = f.querySelector('[data-err]');
