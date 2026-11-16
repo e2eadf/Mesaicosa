@@ -1,5 +1,5 @@
 // Fonctionnement hors ligne : toute l'app est mise en cache à l'installation.
-const VERSION = 'mesaicosa-v2.2.0';
+const VERSION = 'mesaicosa-v2.2.1';
 const FILES = [
   './', 'index.html', 'manifest.webmanifest', 'css/app.css', 'css/actus.css',
   'js/app.js', 'js/editor.js', 'js/crypto.js', 'js/store.js', 'js/schedule.js', 'js/content.js', 'js/content-typing.js', 'js/content-reading.js',
