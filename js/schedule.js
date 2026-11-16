@@ -45,7 +45,9 @@ export function blocksFor(template, dow, wantTT, override) {
   if (!d) return [];
   const variant = variantFor(template, dow, wantTT);
   const base = d[variant] || [];
-  const fixed = base.filter(b => b.fixed);
+  // un planning peut retirer exceptionnellement un créneau bloqué ce jour-là : { office: [...], skip: ['eglise'] }
+  const skip = override && !Array.isArray(override) ? override.skip || [] : [];
+  const fixed = base.filter(b => b.fixed && !skip.includes(b.id));
   const flex = overrideFor(override, variant) || base.filter(b => !b.fixed);
   return sortBlocks([...fixed, ...flex]);
 }
