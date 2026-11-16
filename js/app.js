@@ -2,7 +2,7 @@ import * as S from './store.js';
 import { CATS, MODULES, minutes, blocksFor, sleepFor, isWeekday, templateDay, variantFor, overrideFor } from './schedule.js';
 import { mountEditor } from './editor.js';
 
-export const APP_VERSION = '2.1.2';
+export const APP_VERSION = '2.2.1';
 const view = document.getElementById('view');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const today = () => S.isoDate(new Date());
@@ -243,7 +243,7 @@ function spark(series) {
   return `<svg class="spark" viewBox="0 0 100 34" preserveAspectRatio="none" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="var(--mens)" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`;
 }
 function suggestion() {
-  const ready = Object.keys(MODULES).filter(m => MODULES[m].ready);
+  const ready = Object.keys(MODULES).filter(m => MODULES[m].ready && S.getMap('weights', 'mod-' + m, 2) > 0);
   const score = m => {
     const w = S.getMap('weights', 'mod-' + m, 2);
     const ss = S.sessionsOf(m); const last = ss.length ? ss[ss.length - 1].ts : 0;
@@ -258,7 +258,7 @@ function viewGym() {
     const m = MODULES[id], st = lastAndBest(id);
     const unit = st ? st.last.unit : '';
     return `<${m.ready ? 'a href="#ex/' + id + '"' : 'div'} class="card mod-card ${m.ready ? '' : 'soon'}" style="text-decoration:none;color:inherit">
-      <div class="top"><h3>${m.icon} ${esc(m.name)}</h3>${m.ready ? '' : '<span class="pill">Bientôt</span>'}</div>
+      <div class="top"><h3>${m.icon} ${esc(m.name)}</h3>${m.ready ? (S.getMap('weights', 'mod-' + id, 2) === 0 ? '<span class="pill">En veille</span>' : '') : '<span class="pill">Bientôt</span>'}</div>
       <div class="small muted">${esc(m.where)}</div>
       ${st ? `<div class="row small"><span>Dernier : <b>${st.last.score}</b> ${esc(unit)}</span><span class="muted">Record : ${st.best.score}</span><span class="muted">${st.count} séance${st.count > 1 ? 's' : ''}</span></div>${spark(st.series)}`
            : (m.ready ? '<div class="small muted">Aucune séance pour l\'instant</div>' : '')}
@@ -299,7 +299,7 @@ window.addEventListener('unhandledrejection', e => { if (/is not a function|Fail
 
 // ---------------------------------------------------------------- Boussole
 const HORIZONS = [['long', 'Long terme', '1 an et plus'], ['moyen', 'Ce trimestre', '3 mois'], ['court', 'Cette semaine', '7 jours']];
-const WLABELS = { 1: 'Maintien', 2: 'Normal', 3: 'Priorité' };
+const WLABELS = { 0: 'En veille', 1: 'Maintien', 2: 'Normal', 3: 'Priorité' };
 function viewCompass(section) {
   const st = S.get();
   const DOMS = domains();
@@ -323,9 +323,9 @@ function viewCompass(section) {
   };
   const weights = DOMS.map(([id, name, k, custom]) => {
     const v = S.getMap('weights', id, 2);
-    return `<div class="wrow"><span class="c-${k}" style="border-left:3px solid var(--c);padding-left:8px">${esc(name)}
+    return `<div class="wrow"><span class="c-${k}" style="border-left:3px solid var(--c);padding-left:8px;${v === 0 ? 'opacity:.55' : ''}">${esc(name)}${v === 0 ? ' <span class="pill" style="font-size:11px">en veille</span>' : ''}
         ${custom ? `<button class="btn ghost small" data-ddel="${id}" aria-label="Supprimer le domaine ${esc(name)}">✕</button>` : ''}</span>
-      <div class="seg" role="group" aria-label="Poids de ${esc(name)}">${[1, 2, 3].map(n => `<button aria-pressed="${v === n}" data-w="${id}" data-v="${n}">${WLABELS[n]}</button>`).join('')}</div></div>`;
+      <div class="seg" role="group" aria-label="Poids de ${esc(name)}">${[0, 1, 2, 3].map(n => `<button aria-pressed="${v === n}" data-w="${id}" data-v="${n}">${WLABELS[n]}</button>`).join('')}</div></div>`;
   }).join('');
 
   const mon = S.mondayOf(today());
@@ -340,7 +340,7 @@ function viewCompass(section) {
   render(`
     <div class="spread"><h1>Boussole</h1><button class="btn small" id="for-claude">📋 Copier pour Claude</button></div>
     <div id="for-claude-out"></div>
-    <p class="muted small">Ce que tu vises, et l'importance de chaque domaine. Les priorités orientent les suggestions du Gymnase.</p>
+    <p class="muted small">Ce que tu vises, et l'importance de chaque domaine. Les priorités orientent les suggestions du Gymnase et les plannings préparés par Claude. Un domaine « En veille » ne reçoit plus de créneau, pour laisser du temps aux autres.</p>
     <h2>Objectifs</h2>
     <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr))">${HORIZONS.map(hz).join('')}</div>
     <h2 id="revue">Revue de la semaine</h2>
@@ -373,7 +373,7 @@ function viewCompass(section) {
   // Résumé lisible à coller dans la conversation avec Claude (seulement ce que l'utilisateur choisit de partager)
   document.getElementById('for-claude').onclick = async () => {
     const lines = [`MESAICOSA — résumé de la Boussole pour Claude (${new Date().toLocaleDateString('fr-FR')})`, '', 'Priorités :'];
-    for (const [n, lbl] of [[3, 'Priorité'], [2, 'Normal'], [1, 'Maintien']]) {
+    for (const [n, lbl] of [[3, 'Priorité'], [2, 'Normal'], [1, 'Maintien'], [0, 'En veille (aucun créneau)']]) {
       const ds = DOMS.filter(([id]) => S.getMap('weights', id, 2) === n).map(d => d[1]);
       if (ds.length) lines.push(`- ${lbl} : ${ds.join(' · ')}`);
     }
@@ -419,7 +419,9 @@ function viewCompass(section) {
     const o = S.get().domains.find(x => x.id === b.dataset.ddel); S.upsert('domains', { ...o, deleted: true }); toast('Domaine supprimé'); viewCompass();
   }));
   view.querySelectorAll('[data-w]').forEach(b => b.addEventListener('click', () => {
-    S.setMap('weights', b.dataset.w, Number(b.dataset.v));
+    const was = S.getMap('weights', b.dataset.w, 2), now = Number(b.dataset.v);
+    S.setMap('weights', b.dataset.w, now);
+    if (was === 0 || now === 0) { const y = window.scrollY; viewCompass(); window.scrollTo(0, y); toast(now === 0 ? 'Domaine mis en veille' : 'Domaine réactivé'); return; }
     b.parentElement.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
   }));
   const da = document.getElementById('dom-add');
