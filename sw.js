@@ -1,9 +1,9 @@
 // Fonctionnement hors ligne : toute l'app est mise en cache à l'installation.
-const VERSION = 'mesaicosa-v2.2.1.1';
+const VERSION = 'mesaicosa-v2.3.0';
 const FILES = [
   './', 'index.html', 'manifest.webmanifest', 'css/app.css', 'css/actus.css',
   'js/app.js', 'js/editor.js', 'js/crypto.js', 'js/store.js', 'js/schedule.js', 'js/content.js', 'js/content-typing.js', 'js/content-reading.js',
-  'js/modules/typing.js', 'js/modules/mental.js', 'js/modules/geo.js', 'js/modules/reading.js', 'js/modules/srs-ui.js', 'js/modules/memo.js', 'js/modules/cards.js', 'js/modules/actus.js', 'js/geodata.js', 'data/outremer.json', 'js/modules/finance.js', 'js/modules/bible.js', 'js/srs.js', 'js/cards-finance.js', 'js/cards-bible.js',
+  'js/modules/typing.js', 'js/modules/mental.js', 'js/modules/geo.js', 'js/modules/reading.js', 'js/modules/srs-ui.js', 'js/modules/memo.js', 'js/modules/cards.js', 'js/modules/actus.js', 'js/geodata.js', 'data/outremer.json', 'js/modules/finance.js', 'js/modules/cfa.js', 'js/modules/natur.js', 'js/quiz.js', 'js/version.js', 'js/cases-finance.js', 'js/content-natur.js', 'js/modules/bible.js', 'js/srs.js', 'js/cards-finance.js', 'js/cards-bible.js',
   'vendor/geo.js', 'data/world.json', 'data/countries.json', 'data/flags.json',
   'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png',
 ];
