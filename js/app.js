@@ -1,8 +1,9 @@
 import * as S from './store.js';
 import { CATS, MODULES, minutes, blocksFor, sleepFor, isWeekday, templateDay, variantFor, overrideFor } from './schedule.js';
 import { mountEditor } from './editor.js';
+import { APP_VERSION } from './version.js';
 
-export const APP_VERSION = '2.2.1';
+export { APP_VERSION };
 const view = document.getElementById('view');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const today = () => S.isoDate(new Date());
