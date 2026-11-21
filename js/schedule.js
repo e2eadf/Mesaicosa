@@ -13,11 +13,13 @@ export const MODULES = {
   reading:   { name: 'Lecture rapide', ready: true,  where: 'Téléphone ou ordinateur', icon: '≡' },
   memo:      { name: 'Par cœur (poèmes et textes)', ready: true, where: 'Téléphone ou ordinateur', icon: '❖' },
   cards:     { name: 'Cartes (capitales, finance, versets)', ready: true, where: 'Téléphone ou ordinateur', icon: '▣' },
-  finance:   { name: 'Finance (cartes)', ready: true, where: 'Téléphone ou ordinateur', icon: '€' },
+  finance:   { name: 'Finance (cartes en anglais)', ready: true, where: 'Téléphone ou ordinateur', icon: '€' },
+  cfa:       { name: 'Finance – cas pratiques (CFA)', ready: true, where: 'À la maison (ordinateur)', icon: '∫' },
   eloquence: { name: 'Éloquence',      ready: false, where: 'Ordinateur (voix)', icon: '◔' },
   ia:        { name: "Comprendre l'IA", ready: false, where: 'Téléphone', icon: '◇' },
   actus:     { name: 'Actus', ready: true, where: 'Téléphone ou ordinateur', icon: '◎' },
   bible:     { name: 'Versets bibliques', ready: true, where: 'Téléphone ou ordinateur', icon: '✝' },
+  natur:     { name: 'Naturalisation (examen civique)', ready: true, where: 'Téléphone ou ordinateur', icon: '⚑' },
 };
 
 export const minutes = s => { const [h, m] = s.split(':').map(Number); return h * 60 + m; };

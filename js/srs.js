@@ -4,7 +4,7 @@ import { BIBLE_CARDS } from './cards-bible.js';
 
 export const BUILTIN = [
   { id: 'cap', name: 'Capitales du monde', perDay: 10 },
-  { id: 'finance', name: 'Finance de marché et d\'entreprise', perDay: 8 },
+  { id: 'finance', name: 'Finance (in English, termes FR)', perDay: 8 },
   { id: 'bible', name: 'Versets (Louis Segond 1910)', perDay: 2, verse: true },
   { id: 'mine', name: 'Mes cartes', perDay: 10 },
 ];
