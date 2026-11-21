@@ -90,6 +90,7 @@ export function mountSrs(el, api, opts = {}) {
         <div class="card" id="flash" style="min-height:220px;display:grid;align-content:center;gap:12px;text-align:center;cursor:pointer">
           ${c.hint ? `<div class="tiny muted">${esc(c.hint)}</div>` : ''}
           <div style="font-size:${c.front.length > 80 ? 18 : 22}px;font-weight:600;line-height:1.4">${esc(c.front)}</div>
+          ${c.fr ? `<div class="small muted">🇫🇷 ${esc(c.fr)}</div>` : ''}
           ${d.verse && hint && !shown ? `<div style="font-size:18px;letter-spacing:.12em;line-height:1.7;color:var(--muted)">${esc(firstLetters(c.back))}</div>` : ''}
           ${shown ? `<hr style="border:none;border-top:1px solid var(--line);width:100%;margin:4px 0"><div style="font-size:${c.back.length > 140 ? 16 : 19}px;line-height:1.6;white-space:pre-wrap">${esc(c.back)}</div>` : ''}
         </div>
