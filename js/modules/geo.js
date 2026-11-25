@@ -121,12 +121,13 @@ export function mount(el, api) {
   function drawMap(pool) {
     // carte plus haute sur téléphone : on cadre la zone en largeur et on montre ce qu'il y a autour
     const mw = el.querySelector('#mw');
+    widen(mw);
     const wrapW = mw.clientWidth || 700;
     const W = 960;
     const portrait = wrapW < 700;
     // hauteur disponible : de la carte jusqu'à la barre d'onglets, en gardant une marge
     const tab = window.innerWidth < 900 ? 64 : 0;
-    const avail = window.innerHeight - mw.getBoundingClientRect().top - tab - (mode === 'ou' ? 16 : 150) - 12;
+    const avail = window.innerHeight - mw.getBoundingClientRect().top - tab - (mode === 'ou' ? 16 : 250) - 12;
     const targetH = portrait ? Math.max(260, Math.min(avail, wrapW * 1.5)) : Math.max(320, Math.min(avail, wrapW * 0.6));
     const H = Math.round(W * targetH / wrapW);
     const svg = el.querySelector('#map');
@@ -147,7 +148,7 @@ export function mount(el, api) {
     if (mode === 'ou') {
       const small = pool.filter(f => (f.info.a || 1e9) < 15000).sort((a, b) => (b.info.a || 0) - (a.info.a || 0));
       gSel.selectAll('circle.mini').data(small).enter().append('circle')
-        .attr('class', 'land mini').attr('data-id', d => d.id).attr('data-r', 6)
+        .attr('class', 'land mini').attr('data-id', d => d.id).attr('data-r', 4)
         .attr('cx', d => path.centroid(mainPart(d))[0]).attr('cy', d => path.centroid(mainPart(d))[1])
         .attr('r', 6).attr('vector-effect', 'non-scaling-stroke').style('fill-opacity', .55)
         .on('click', (ev, d) => onMapClick(d));
@@ -166,6 +167,20 @@ export function mount(el, api) {
     el.querySelector('#zi').onclick = () => svgSel.call(zoomer.scaleBy, 1.6);
     el.querySelector('#zo').onclick = () => svgSel.call(zoomer.scaleBy, 1 / 1.6);
     el.querySelector('#zr').onclick = () => svgSel.call(zoomer.transform, zoomIdentity);
+  }
+
+  // Sur ordinateur, la carte sort de la colonne de texte et occupe toute la largeur disponible
+  function widen(mw) {
+    if (window.innerWidth < 900) return;
+    const tb = document.querySelector('.tabbar')?.getBoundingClientRect();
+    const leftEdge = tb && tb.height > tb.width ? tb.right : 0;
+    const room = document.documentElement.clientWidth - leftEdge - 32;
+    const parent = mw.parentElement.getBoundingClientRect();
+    // pas plus large que ce que la hauteur de l'écran permet d'afficher (planisphère ≈ 2 fois plus large que haut)
+    const W = Math.min(room, 1600, Math.max(parent.width, (window.innerHeight - mw.getBoundingClientRect().top - (mode === 'ou' ? 30 : 260)) * 2.05));
+    if (W <= parent.width) return;
+    mw.style.width = W + 'px';
+    mw.style.marginLeft = (leftEdge + 16 + (room - W) / 2 - parent.left) + 'px';
   }
 
   // rayon des points en pixels d'écran, quel que soit le zoom et la taille de la carte (data-r = pixels)
