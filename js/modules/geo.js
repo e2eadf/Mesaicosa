@@ -7,7 +7,8 @@ function speak(text) { try { const u = new SpeechSynthesisUtterance(text); u.lan
 
 const ALL = 'Tous les continents';
 const REGIONS = [ALL, 'Europe', 'Afrique', 'Asie', 'Amérique du Nord et centrale', 'Amérique du Sud', 'Océanie'];
-const MODES = [['ou', 'Où est… ?'], ['nom', 'Quel est ce pays ?'], ['cap', 'Capitales']];
+const MODES = [['ou', 'Où est… ?'], ['nom', 'Quel est ce pays ?'], ['cap', 'Capitales'], ['drap', 'Drapeaux']];
+const FDIRS = [['mix', 'Les deux, en alternance'], ['f2n', 'Drapeau → pays'], ['n2f', 'Pays → drapeau']];
 const COUNTS = [[10, '10'], [25, '25'], [0, 'Tous']];
 const loadData = () => loadWorld();
 
@@ -31,6 +32,7 @@ export function mount(el, api) {
   let region = REGIONS.includes(saved.region) ? saved.region : (saved.region === 'Monde' ? ALL : 'Europe');
   let count = saved.count ?? 10;
   let terr = saved.terr ?? true;   // territoires dépendants et États non membres de l'ONU
+  let fdir = saved.fdir || 'mix';   // sens du quiz des drapeaux
   const inPool = i => i.u || (terr && i.t);
   let data, queue, idx, ok, answered, selected, lastClick, svgSel, gSel, zoomer, path, waiting = false, VW = 960, VH = 520, anim = 0, timeouts = [];
   const later = (fn, ms) => timeouts.push(setTimeout(fn, ms));
@@ -55,6 +57,7 @@ export function mount(el, api) {
       <div class="card">
         <div style="display:grid;gap:14px">
           <div><div class="small muted" style="margin-bottom:6px">Exercice</div>${seg('mode', MODES, mode)}</div>
+          <div id="fdir-box" ${mode === 'drap' ? '' : 'hidden'}><div class="small muted" style="margin-bottom:6px">Sens</div>${seg('fdir', FDIRS, fdir)}</div>
           <div><label class="small muted" for="reg">Zone</label>
             <select id="reg">${REGIONS.map(r => `<option ${r === region ? 'selected' : ''}>${r}</option>`).join('')}</select></div>
           <div><div class="small muted" style="margin-bottom:6px">Nombre de questions</div>${seg('count', COUNTS, count)}
@@ -73,7 +76,8 @@ export function mount(el, api) {
       const n = poolFor().length;
       el.querySelector('#cnt-info').textContent = `${n} pays${terr ? ' et territoires' : ''} dans cette zone${count && count < n ? ` · ${count} questions tirées au sort` : ''}`;
     };
-    el.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => { mode = b.dataset.mode; el.querySelectorAll('[data-mode]').forEach(x => x.setAttribute('aria-pressed', x === b)); info(); });
+    el.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => { mode = b.dataset.mode; el.querySelectorAll('[data-mode]').forEach(x => x.setAttribute('aria-pressed', x === b)); el.querySelector('#fdir-box').hidden = mode !== 'drap'; info(); });
+    el.querySelectorAll('[data-fdir]').forEach(b => b.onclick = () => { fdir = b.dataset.fdir; el.querySelectorAll('[data-fdir]').forEach(x => x.setAttribute('aria-pressed', x === b)); });
     el.querySelectorAll('[data-count]').forEach(b => b.onclick = () => { count = Number(b.dataset.count); el.querySelectorAll('[data-count]').forEach(x => x.setAttribute('aria-pressed', x === b)); info(); });
     el.querySelector('#reg').onchange = e => { region = e.target.value; info(); };
     el.querySelector('#terr').onchange = e => { terr = e.target.checked; info(); };
@@ -88,14 +92,16 @@ export function mount(el, api) {
   }
 
   function poolFor() {
-    return data.feats.filter(f => inPool(f.info) && (region === ALL || f.info.r === region) && (mode !== 'cap' || (f.info.c && f.info.c !== '—')));
+    return data.feats.filter(f => inPool(f.info) && (region === ALL || f.info.r === region)
+      && (mode !== 'cap' || (f.info.c && f.info.c !== '—'))
+      && (mode !== 'drap' || (f.info.i2 && data.flags[f.info.i2])));
   }
 
   async function start() {
     data = await loadData();
     const pool = poolFor();
     queue = weightedPick(pool, count || pool.length); idx = 0; ok = 0;
-    if (mode === 'cap') return quizCap(pool);
+    if (mode === 'cap' || mode === 'drap') return quizChoice(pool);
     el.innerHTML = `
       <div class="spread small" style="margin-bottom:6px"><span>Question <b id="qn">1</b> / ${queue.length}</span><span><b id="okn">0</b> juste(s)</span>
         <button class="btn small ghost" id="stop">Arrêter</button></div>
@@ -139,21 +145,32 @@ export function mount(el, api) {
       .attr('data-id', d => d.id).attr('d', path)
       .on('click', (ev, d) => onMapClick(d));
     if (mode === 'ou') {
-      gSel.selectAll('circle.mini').data(pool.filter(f => (f.info.a || 1e9) < 15000)).enter().append('circle')
-        .attr('class', 'land mini').attr('data-id', d => d.id)
+      const small = pool.filter(f => (f.info.a || 1e9) < 15000).sort((a, b) => (b.info.a || 0) - (a.info.a || 0));
+      gSel.selectAll('circle.mini').data(small).enter().append('circle')
+        .attr('class', 'land mini').attr('data-id', d => d.id).attr('data-r', 6)
         .attr('cx', d => path.centroid(mainPart(d))[0]).attr('cy', d => path.centroid(mainPart(d))[1])
         .attr('r', 6).attr('vector-effect', 'non-scaling-stroke').style('fill-opacity', .55)
         .on('click', (ev, d) => onMapClick(d));
+      // micro-États (Vatican, Monaco, Saint-Marin…) : zone de sélection invisible plus large autour du point
+      gSel.selectAll('circle.hit').data(small.filter(f => (f.info.a || 1e9) < 1000)).enter().append('circle')
+        .attr('class', 'hit').attr('data-r', 16)
+        .attr('cx', d => path.centroid(mainPart(d))[0]).attr('cy', d => path.centroid(mainPart(d))[1])
+        .style('fill', 'transparent').style('cursor', 'pointer')
+        .on('click', (ev, d) => onMapClick(d));
     }
     zoomer = zoom().scaleExtent([1, 30]).translateExtent([[-300, -300], [W + 300, H + 300]])
-      .on('zoom', ev => { gSel.attr('transform', ev.transform); gSel.selectAll('circle').attr('r', 6 / ev.transform.k); });
+      .on('zoom', ev => { gSel.attr('transform', ev.transform); sizeCircles(ev.transform.k); });
     svgSel.call(zoomer).on('dblclick.zoom', null);
+    sizeCircles(1);
     svgSel.on('click.next', () => { if (waiting) next(); });
     el.querySelector('#zi').onclick = () => svgSel.call(zoomer.scaleBy, 1.6);
     el.querySelector('#zo').onclick = () => svgSel.call(zoomer.scaleBy, 1 / 1.6);
     el.querySelector('#zr').onclick = () => svgSel.call(zoomer.transform, zoomIdentity);
   }
 
+  // rayon des points en pixels d'écran, quel que soit le zoom et la taille de la carte (data-r = pixels)
+  const px = () => VW / (svgSel.node().getBoundingClientRect().width || VW);
+  function sizeCircles(k = zoomTransform(svgSel.node()).k) { const f = px() / k; gSel.selectAll('circle').attr('r', function () { return (this.dataset.r || 6) * f; }); }
   const marks = sel => gSel.selectAll(sel);
   function setClass(id, cls, on = true) { marks(`[data-id="${CSS.escape(id)}"]`).classed(cls, on); }
   function clearMarks() { marks('.good,.bad,.target,.sel').classed('good', false).classed('bad', false).classed('target', false).classed('sel', false); }
@@ -177,7 +194,8 @@ export function mount(el, api) {
       choices.querySelectorAll('button').forEach(b => b.onclick = () => answer(b.dataset.id === f.id, b));
       if ((f.info.a || 1e9) < 15000) {
         const [x, y] = path.centroid(mainPart(f));
-        gSel.append('circle').attr('class', 'land target tmp').attr('cx', x).attr('cy', y).attr('r', 7).attr('data-id', f.id);
+        gSel.append('circle').attr('class', 'land target tmp').attr('cx', x).attr('cy', y).attr('data-r', 7).attr('data-id', f.id);
+        sizeCircles();
       }
     }
   }
@@ -252,7 +270,7 @@ export function mount(el, api) {
       <div class="fiche-name">${esc(i.n)}</div>
       <dl>
         ${i.st ? `<dt>Statut</dt><dd>${esc(i.st)}</dd>` : ''}
-        ${i.c && i.c !== '—' ? `<dt>${i.om ? 'Chef-lieu' : 'Capitale'}</dt><dd>${esc(i.c)}</dd>` : ''}
+        ${i.c && i.c !== '—' ? `<dt>${i.om ? 'Chef-lieu' : 'Capitale'}</dt><dd>${esc(i.c)}${i.c2 ? `<div class="tiny muted">${esc(i.c2)}</div>` : ''}</dd>` : ''}
         ${i.p ? `<dt>Population</dt><dd>${i.pa ? '≈ ' : ''}${nf.format(i.p)}${i.py ? ` <span class="tiny muted">(${i.py})</span>` : ''}</dd>` : ''}
         ${i.a ? `<dt>Superficie</dt><dd>${nf.format(i.a)} km²</dd>` : ''}
         ${i.cur?.length ? `<dt>Monnaie</dt><dd>${i.cur.map(c => `${esc(curName(c))} (${esc(c)})`).join(', ')}</dd>` : ''}
@@ -280,32 +298,58 @@ export function mount(el, api) {
     ask();
   }
 
-  function quizCap(pool) {
+  // Capitales et drapeaux : 4 choix ; après la réponse, chaque choix affiche sa correspondance,
+  // et l'on passe à la question suivante d'un clic (pour apprendre aussi les autres réponses)
+  const flagImg = (i, cls = 'qflag') => `<img class="${cls}" src="data:image/svg+xml;charset=utf-8,${encodeURIComponent(data.flags[i.i2])}" alt="" style="${{ qflag: 'height:120px;max-width:100%;border:1px solid var(--line);border-radius:6px;display:block;margin:6px auto 2px', mflag: 'height:24px;border:1px solid var(--line);border-radius:3px;display:block;margin:2px auto 0' }[cls] || 'width:100%;aspect-ratio:3/2;object-fit:contain;display:block'}">`;
+  function quizChoice(pool) {
+    const others = f => {
+      let cand = pool.filter(x => x.id !== f.id);
+      if (cand.length < 3) cand = data.feats.filter(x => x.id !== f.id && inPool(x.info) && (mode !== 'drap' || (x.info.i2 && data.flags[x.info.i2])) && (mode !== 'cap' || (x.info.c && x.info.c !== '—')));
+      return shuffle(cand.slice()).slice(0, 3);
+    };
     const qs = queue.map(f => {
-      const reverse = Math.random() < 0.4;
-      const others = shuffle(pool.filter(x => x.id !== f.id)).slice(0, 3);
-      return reverse
-        ? { f, q: `${f.info.c} est la capitale de…`, opts: shuffle([f, ...others].map(x => ({ id: x.id, t: x.info.n }))) }
-        : { f, q: `Quelle est la capitale de : ${f.info.n} ?`, opts: shuffle([f, ...others].map(x => ({ id: x.id, t: x.info.c }))) };
+      const opts = shuffle([f, ...others(f)]);
+      if (mode === 'cap') {
+        const reverse = Math.random() < 0.4;
+        return reverse ? { f, kind: 'c2n', q: `${esc(f.info.c)} est la capitale de…`, opts }
+          : { f, kind: 'n2c', q: `Quelle est la capitale de : ${esc(f.info.n)} ?`, opts };
+      }
+      const k = fdir === 'mix' ? (Math.random() < 0.5 ? 'f2n' : 'n2f') : fdir;
+      return k === 'f2n' ? { f, kind: 'f2n', q: `À quel pays appartient ce drapeau ?${flagImg(f.info)}`, opts }
+        : { f, kind: 'n2f', q: `Quel est le drapeau de : ${esc(f.info.n)} ?`, opts };
     });
+    const label = (it, o) => it.kind === 'n2c' ? esc(o.info.c) : it.kind === 'n2f' ? flagImg(o.info, 'oflag') : esc(o.info.n);
+    // correspondance affichée après la réponse
+    const match = (it, o) => it.kind === 'n2c' ? esc(o.info.n) : it.kind === 'c2n' ? esc(o.info.c) : it.kind === 'n2f' ? esc(o.info.n) : flagImg(o.info, 'mflag');
     const show = () => {
-      const it = qs[idx]; answered = false;
+      const it = qs[idx]; answered = false; waiting = false;
+      const grid = it.kind === 'n2f' ? 'grid-template-columns:repeat(2,1fr)' : '';
       el.innerHTML = `<div class="spread small" style="margin-bottom:6px"><span>Question ${idx + 1} / ${qs.length}</span><span>${ok} juste(s)</span><button class="btn small ghost" id="stop">Arrêter</button></div>
-        <div class="q-banner">${esc(it.q)}</div>
-        <div class="choices">${it.opts.map(o => `<button class="btn choice" data-id="${o.id}">${esc(o.t)}</button>`).join('')}</div>
-        <div id="fb" class="small" style="text-align:center;min-height:22px;margin-top:10px"></div>`;
-      el.querySelector('#stop').onclick = () => (idx > 0 ? end() : intro());
+        <div class="q-banner">${it.q}</div>
+        <div class="choices" style="${grid}">${it.opts.map(o => `<button class="btn choice" data-id="${o.id}" style="flex-direction:column;gap:4px;${it.kind === 'n2f' ? 'padding:8px' : ''}"><span>${label(it, o)}</span><span class="tiny muted" data-match></span></button>`).join('')}</div>
+        <div id="fb" class="small" style="text-align:center;min-height:22px;margin-top:10px"></div>
+        <div id="nx" style="text-align:center"></div>`;
+      el.querySelector('#stop').onclick = () => (idx > 0 || answered ? end() : intro());
       el.querySelectorAll('.choice').forEach(b => b.onclick = () => {
-        if (answered) return; answered = true;
+        if (answered) { next2(); return; }
+        answered = true;
         const good = b.dataset.id === it.f.id;
         S.geoMark(it.f.id, good); if (good) ok++;
-        el.querySelectorAll('.choice').forEach(x => { if (x.dataset.id === it.f.id) x.classList.add('ok'); });
+        el.querySelectorAll('.choice').forEach(x => {
+          const o = it.opts.find(y => y.id === x.dataset.id);
+          if (x.dataset.id === it.f.id) x.classList.add('ok');
+          const m = match(it, o); if (m) x.querySelector('[data-match]').innerHTML = (it.kind === 'n2f' || it.kind === 'f2n' ? '' : '→ ') + m;
+        });
         if (!good) b.classList.add('ko');
-        el.querySelector('#fb').innerHTML = good ? '<span class="feedback-ok">Exact.</span>'
-          : `<span class="feedback-ko">${esc(it.f.info.n)} → ${esc(it.f.info.c)}</span>`;
-        later(() => { idx++; idx < qs.length ? show() : end(); }, good ? 800 : 2000);
+        const right = it.kind === 'n2c' ? `${esc(it.f.info.n)} → ${esc(it.f.info.c)}` : esc(it.f.info.n);
+        el.querySelector('#fb').innerHTML = (good ? '<span class="feedback-ok">Exact.</span>' : `<span class="feedback-ko">C'était : ${right}</span>`)
+          + (it.f.info.c2 && mode === 'cap' ? `<div class="tiny muted">${esc(it.f.info.c2)}</div>` : '');
+        el.querySelector('#nx').innerHTML = `<button class="btn primary" id="nx-go" style="margin-top:8px">${idx + 1 < qs.length ? 'Question suivante' : 'Voir le résultat'}</button>`;
+        el.querySelector('#nx-go').onclick = next2;
+        el.querySelector('#nx-go').focus({ preventScroll: true });
       });
     };
+    const next2 = () => { idx++; idx < qs.length ? show() : end(); };
     show();
   }
 
@@ -315,7 +359,7 @@ export function mount(el, api) {
     const n = Math.min(queue.length, idx + (answered && idx < queue.length ? 1 : 0));
     if (!n) { intro(); return; }
     const pct = Math.round(100 * ok / n);
-    api.save(pct, '%', { mode, region, ok, n, count, terr, total: queue.length });
+    api.save(pct, '%', { mode, region, ok, n, count, terr, total: queue.length, ...(mode === 'drap' ? { fdir } : {}) });
     el.innerHTML = `<div class="card" style="text-align:center;border-color:var(--ok)">
       <h3>${ok} / ${n} · ${pct} %</h3>
       <p class="small muted">${n < queue.length ? `Séance arrêtée après ${n} questions sur ${queue.length}. ` : ''}${pct === 100 ? 'Sans faute. Passe à une autre zone ou un autre exercice.' : 'Les pays manqués reviendront plus souvent.'}</p>

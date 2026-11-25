@@ -114,7 +114,9 @@ export function setTemplate(v) {
 function mergeTemplate(a, b) {
   if (!a) return b; if (!b) return a;
   const dayT = (x, d) => x.dt?.[d] ?? x.t ?? 0;
-  const out = { v: { ...(a.v || {}), days: {} }, t: Math.max(a.t || 0, b.t || 0), dt: {} };
+  // réglages généraux (ex. wkAnchor) : ceux de la version la plus récente, sans perdre ceux que l'autre est seule à avoir
+  const [older, newer] = (b.t || 0) > (a.t || 0) ? [a, b] : [b, a];
+  const out = { v: { ...(older.v || {}), ...(newer.v || {}), days: {} }, t: Math.max(a.t || 0, b.t || 0), dt: {} };
   for (let d = 0; d < 7; d++) {
     const win = dayT(b, d) > dayT(a, d) ? b : a;
     const day = win.v?.days?.[d] ?? (win === a ? b : a).v?.days?.[d];
