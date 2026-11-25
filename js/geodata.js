@@ -1,6 +1,7 @@
 // Données de la carte du monde, partagées par Géographie et Actus.
 // Les territoires d'outre-mer (data/outremer.json) sont détachés de leur pays au chargement.
 import { geoCentroid, feature } from '../vendor/geo.js';
+import { fixCapitals } from './capitals.js';
 
 let cache = null;
 const json = url => fetch(url).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
@@ -11,6 +12,7 @@ export async function loadWorld() {
     json('data/world.json'), json('data/countries.json'),
     json('data/flags.json').catch(() => ({})), json('data/outremer.json').catch(() => null),
   ]);
+  fixCapitals(info);
   const feats = feature(topo, topo.objects.countries).features;
   if (om) {
     Object.assign(info, om.countries || {});

@@ -1,6 +1,7 @@
 // Répétition espacée (variante de SM-2, comme Anki) + paquets de cartes.
 import { FINANCE_CARDS } from './cards-finance.js';
 import { BIBLE_CARDS } from './cards-bible.js';
+import { fixCapitals } from './capitals.js';
 
 export const BUILTIN = [
   { id: 'cap', name: 'Capitales du monde', perDay: 10 },
@@ -13,7 +14,7 @@ let capCards = null;
 const hash = s => { let h = 2166136261; for (const ch of s) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 async function loadCapitals() {
   if (capCards) return capCards;
-  const info = await fetch('data/countries.json').then(r => r.json());
+  const info = fixCapitals(await fetch('data/countries.json').then(r => r.json()));
   capCards = Object.entries(info).filter(([, c]) => c.u && c.c)
     .map(([id, c]) => ({ id: 'cap-' + id, deck: 'cap', hint: c.r, front: `Capitale : ${c.n}`, back: c.c }))
     .sort((a, b) => hash(a.id) - hash(b.id)); // ordre mélangé mais stable d'un jour à l'autre

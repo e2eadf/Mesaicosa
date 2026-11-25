@@ -21,7 +21,7 @@ export function mountEditor(el, opts) {
     if (b.review) mods.push('Revue hebdo');
     return `<div class="block c-${b.k}" style="grid-template-columns:62px 1fr auto">
       <div class="time">${hfr(b.s)}<br>${hfr(b.e)}</div>
-      <div><div class="lbl">${b.fixed ? '🔒 ' : ''}${esc(b.l)}</div>
+      <div><div class="lbl">${b.fixed ? '🔒 ' : ''}${esc(b.l)}${b.wk != null ? ` <span class="pill tiny">1 semaine sur 2 (${b.wk === 0 ? 'A' : 'B'})</span>` : ''}</div>
         <div class="sub">${esc(CATS[b.k] || '')}${b.sub ? ' · ' + esc(b.sub) : ''}${mods.length ? ' · ' + esc(mods.join(', ')) : ''}</div></div>
       <div class="row" style="gap:4px">${locked ? '<span class="tiny muted">bloqué</span>'
         : `<button class="btn small ghost" data-edit="${b.id}" aria-label="Modifier ${esc(b.l)}">✎</button>
@@ -74,6 +74,7 @@ export function mountEditor(el, opts) {
         if (!s || !en || minutes(en) <= minutes(s)) { err.textContent = 'La fin doit être après le début.'; f.e.focus(); return; }
         const mods = [...f.querySelectorAll('[data-mod]:checked')].map(x => x.dataset.mod);
         const rec = { id: editing === 'new' ? uid() : editing, s, e: en, l, k: f.k.value };
+        const prev = blocks.find(x => x.id === editing); if (prev?.wk != null) rec.wk = prev.wk;
         if (f.sub.value.trim()) rec.sub = f.sub.value.trim();
         const m = mods.filter(x => x !== '__review'); if (m.length) rec.mods = m;
         if (mods.includes('__review')) rec.review = true;
