@@ -2,6 +2,7 @@ import * as S from './store.js';
 import { CATS, MODULES, minutes, blocksFor, sleepFor, isWeekday, templateDay, variantFor, overrideFor } from './schedule.js';
 import { mountEditor } from './editor.js';
 import { APP_VERSION } from './version.js';
+import { viewStats } from './stats.js';
 
 export { APP_VERSION };
 const view = document.getElementById('view');
@@ -24,7 +25,7 @@ function isTT(date) { return S.getMap('tt', date, false); }
 function override(date) { return S.getMap('overrides', date, null); }
 function curVariant(date) { return variantFor(S.template(), dowOf(date), isTT(date)); }
 function dayModified(date) { return !!overrideFor(override(date), curVariant(date)); }
-function dayBlocks(date) { return blocksFor(S.template(), dowOf(date), isTT(date), override(date)); }
+function dayBlocks(date) { return blocksFor(S.template(), dowOf(date), isTT(date), override(date), date); }
 // une liste « toutes versions » devient {office, tt} au moment où l'on modifie une seule version
 const asObj = o => !o ? {} : Array.isArray(o) ? { office: o, tt: o } : { ...o };
 function checked(date, id) { return S.getMap('checks', `${date}|${id}`, false); }
@@ -33,8 +34,15 @@ function domains() {
     ...Object.entries(MODULES).map(([id, m]) => ['mod-' + id, m.name, 'mens', false])];
 }
 
-let cleanup = null;
-function render(html) { if (cleanup) { cleanup(); cleanup = null; } view.innerHTML = html; view.focus({ preventScroll: true }); window.scrollTo(0, 0); }
+let cleanup = null, lastRoute = null;
+// Même page réaffichée (case cochée, télétravail…) : on garde la position ; nouvelle page : retour en haut
+function render(html) {
+  if (cleanup) { cleanup(); cleanup = null; }
+  const same = location.hash === lastRoute, y = window.scrollY;
+  lastRoute = location.hash;
+  view.innerHTML = html; view.focus({ preventScroll: true });
+  window.scrollTo(0, same ? y : 0);
+}
 
 const onboarding = () => `<div class="card" style="text-align:center;padding:24px">
   <h2 style="margin-top:0">Ta semaine type n'est pas encore définie</h2>
@@ -82,7 +90,7 @@ function viewDay(date, mode) {
   const nowMin = new Date().getHours() * 60 + new Date().getMinutes();
   const counted = blocks.filter(b => b.k !== 'vie');
   const done = counted.filter(b => checked(date, b.id)).length;
-  const sl = sleepFor(tpl, dow), nextWake = sleepFor(tpl, (dow + 1) % 7).wake;
+  const sl = sleepFor(tpl, dow, isTT(date)), nextWake = sleepFor(tpl, (dow + 1) % 7, isTT(S.addDays(date, 1))).wake;
 
   const blockHtml = b => {
     const on = checked(date, b.id);
@@ -141,7 +149,7 @@ function viewTemplate(dowArg, variantArg) {
       ${variant === 'tt' && !day.tt ? '<button class="btn small" id="mk-tt">Créer la version télétravail (copie de la version bureau)</button>' : ''}
       ${variant === 'tt' && day.tt ? '<button class="btn small ghost" id="rm-tt">Supprimer la version télétravail</button>' : ''}</div>` : ''}
     <div class="card row" style="margin-bottom:12px">
-      <label style="flex:1">Réveil (ce matin)<input type="time" id="wake" value="${day.wake}"></label>
+      <label style="flex:1">${variant === 'tt' ? 'Réveil (jours de télétravail)' : 'Réveil (ce matin)'}<input type="time" id="wake" value="${variant === 'tt' ? day.wakeTT || day.wake : day.wake}"></label>
       <label style="flex:1">Coucher (ce soir)<input type="time" id="bed" value="${day.bed}"></label>
     </div>
     <div id="ed"></div>
@@ -156,7 +164,7 @@ function viewTemplate(dowArg, variantArg) {
     day.tt = day.office.map(b => ({ ...b, id: S.uid() })); save(); viewTemplate(dow, 'tt');
   });
   document.getElementById('rm-tt')?.addEventListener('click', () => { day.tt = null; save(); viewTemplate(dow, 'office'); });
-  document.getElementById('wake').onchange = e => { day.wake = e.target.value; save(); };
+  document.getElementById('wake').onchange = e => { if (variant === 'tt') day.wakeTT = e.target.value; else day.wake = e.target.value; save(); };
   document.getElementById('bed').onchange = e => { day.bed = e.target.value; save(); };
   const ed = document.getElementById('ed');
   if (variant === 'tt' && !day.tt) ed.innerHTML = '<div class="empty">Pas encore de version télétravail pour ce jour.</div>';
@@ -196,7 +204,7 @@ function viewWeek(anchor) {
   for (let h = 7; h <= 23; h++) axis += `<div style="top:${(h * 60 - START) * PX}px">${h}h</div>`;
   const cols = days.map(ds => {
     const dow = dowOf(ds);
-    const wake = minutes(sleepFor(tpl, dow).wake), bed = minutes(sleepFor(tpl, dow).bed);
+    const wake = minutes(sleepFor(tpl, dow, isTT(ds)).wake), bed = minutes(sleepFor(tpl, dow).bed);
     let c = `<div class="col" style="height:${H}px" data-day="${ds}">`;
     for (let h = 7; h <= 23; h++) c += `<div class="hl" style="top:${(h * 60 - START) * PX}px"></div>`;
     if (wake > START) c += `<div class="sleep" style="top:0;height:${(wake - START) * PX}px">sommeil</div>`;
@@ -266,7 +274,7 @@ function viewGym() {
     </${m.ready ? 'a' : 'div'}>`;
   };
   render(`
-    <h1>Gymnase</h1>
+    <div class="spread"><h1>Gymnase</h1><a class="btn small" href="#stats">📈 Statistiques</a></div>
     <p class="muted small">Des séances courtes et mesurées. La suggestion tient compte de tes priorités (Boussole) et de ce que tu n'as pas travaillé récemment.</p>
     <div class="card suggest" style="margin:14px 0">
       <div class="small muted">Suggestion du moment</div>
@@ -578,13 +586,14 @@ function viewData() {
 function route() {
   const [name, arg, arg2] = (location.hash.slice(1) || 'jour').split('/');
   document.querySelectorAll('.tabbar a').forEach(a => a.classList.toggle('active',
-    a.dataset.tab === name || (name === 'ex' && a.dataset.tab === 'gymnase') || (name === 'modele' && a.dataset.tab === 'semaine')));
+    a.dataset.tab === name || ((name === 'ex' || name === 'stats') && a.dataset.tab === 'gymnase') || (name === 'modele' && a.dataset.tab === 'semaine')));
   if (name === 'jour') viewDay(arg || today(), arg2);
   else if (name === 'semaine') viewWeek(arg || today());
   else if (name === 'modele') viewTemplate(arg ?? 1, arg2);
   else if (name === 'gymnase') viewGym();
   else if (name === 'ex') viewExercise(arg);
   else if (name === 'boussole') viewCompass(arg);
+  else if (name === 'stats') { render('<div id="st"></div>'); viewStats(document.getElementById('st'), { S, esc, MODULES }, arg, arg2 && decodeURIComponent(arg2)); }
   else if (name === 'donnees') viewData();
   else viewDay(today());
 }
