@@ -174,7 +174,7 @@ export function mount(el, api) {
         <span>Temps <b class="timer" id="time">0</b> s</span>
       </div>
       <div class="typing-text" id="tt" tabindex="0" aria-label="Texte à recopier. Touche ici puis tape."></div>
-      <textarea class="hidden-input" id="in" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Zone de frappe"></textarea>
+      <textarea class="hidden-input" id="in" maxlength="${text.length}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Zone de frappe"></textarea>
       ${uiPref ? kbHtml() : ''}
       <p class="small muted">Garde les yeux sur l'écran, jamais sur ton clavier : le clavier affiché te montre la touche et le doigt à utiliser. Index posés sur F et J (les touches à repère). Au début, la précision sera basse : c'est normal, elle montera avec la régularité. Après une erreur, tu peux continuer ou corriger avec Retour arrière. Les caractères absents du clavier (É, À, œ, « »…) se tapent avec Alt + code : voir le tableau.</p>
       <div class="row"><button class="btn" id="new">${modePref === 'syll' ? 'Autre série' : 'Autre texte'}</button>
@@ -196,7 +196,10 @@ export function mount(el, api) {
     const kb = el.querySelector('#kb'); if (!kb) return;
     kb.querySelectorAll('.next,.then').forEach(k => k.classList.remove('next', 'then'));
     const hint = el.querySelector('#kb-hint');
-    if (typed.length >= text.length) { hint.textContent = ''; return; }
+    if (typed.length >= text.length) {
+      hint.innerHTML = typed[text.length - 1] !== text[text.length - 1] ? '<span class="feedback-ko">Dernier caractère faux : corrige-le avec Retour arrière.</span>' : '';
+      return;
+    }
     // si la frappe précédente est fausse, on montre la touche Retour arrière
     // une erreur ne bloque pas : on montre toujours la touche suivante ; corriger reste possible avec Retour arrière
     const lastWrong = typed.length && typed[typed.length - 1] !== text[typed.length - 1];
@@ -256,7 +259,8 @@ export function mount(el, api) {
     }
     typed = v.slice(0, text.length);
     draw(); tick();
-    if (typed.length >= text.length) finish();
+    // fin seulement si le dernier caractère est juste : sinon on peut encore l'effacer et le corriger
+    if (typed.length >= text.length && typed[text.length - 1] === text[text.length - 1]) finish();
   }
 
   function finish() {
